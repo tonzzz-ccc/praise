@@ -132,12 +132,7 @@ const awardeeColumns = [
     render: (_, awardee) => (awardee.nominee_type === 'section' ? 'Section or unit' : (awardee.unit_name ?? '—')),
   },
   { title: 'Conferred', dataIndex: 'conferment_date', render: (date) => formatDate(date) },
-  {
-    title: 'Plaque',
-    key: 'plaque',
-    render: (_, awardee) =>
-      !awardee.has_plaque ? 'None' : awardee.plaque_released_on ? `Released ${formatDate(awardee.plaque_released_on)}` : 'Not yet released',
-  },
+  { title: 'Plaque or certificate', key: 'plaque', render: (_, awardee) => itemState(awardee, (date) => `released ${formatDate(date)}`) },
   {
     title: 'Grant',
     key: 'grant',
@@ -150,6 +145,23 @@ const awardeeColumns = [
           : 'Not yet released',
   },
 ]
+
+// The plaque (award winners) or certificate (COH Choice) and whether it was released.
+function itemState(awardee, released) {
+  const item = awardee.has_certificate ? 'Certificate' : awardee.has_plaque ? 'Plaque' : null
+  if (!item) return 'None'
+  const date = awardee.has_certificate ? awardee.certificate_released_on : awardee.plaque_released_on
+  return `${item} ${date ? released(date) : 'not yet released'}`
+}
+
+// "2 of 5 plaques, 1 of 2 certificates released", leaving out an item no awardee gets.
+function releasedDetail(totals) {
+  const parts = [
+    totals.plaques_due > 0 && `${totals.plaques_released} of ${totals.plaques_due} plaques`,
+    totals.certificates_due > 0 && `${totals.certificates_released} of ${totals.certificates_due} certificates`,
+  ].filter(Boolean)
+  return parts.length > 0 ? `${parts.join(', ')} released` : null
+}
 
 // A peso cell in a column of counts.
 const peso = (amount) => (amount === null || amount === undefined ? null : { value: amount, format: 'money' })
@@ -169,6 +181,7 @@ function exportExcel(report, centerName) {
     ['Shortlisted', totals.shortlisted],
     ['Awardees', totals.awarded],
     ['Plaques released', `${totals.plaques_released} of ${totals.plaques_due}`],
+    ['Certificates released', `${totals.certificates_released} of ${totals.certificates_due}`],
     [null, null],
     ['Budget (PHP)', peso(budget.allocation) ?? 'Not set'],
     ['Grants released (PHP)', peso(budget.released)],
@@ -233,7 +246,7 @@ function exportExcel(report, centerName) {
         { header: 'Position', width: 28 },
         { header: 'Unit', width: 32 },
         { header: 'Conferred', width: 14 },
-        { header: 'Plaque released', width: 16 },
+        { header: 'Plaque or certificate', width: 30 },
         { header: 'Grant (PHP)', width: 16, format: 'money' },
         { header: 'Grant released', width: 16 },
       ],
@@ -243,7 +256,7 @@ function exportExcel(report, centerName) {
         awardee.position_title,
         awardee.nominee_type === 'section' ? 'Section or unit' : awardee.unit_name,
         awardee.conferment_date?.slice(0, 10) ?? null,
-        !awardee.has_plaque ? 'None' : (awardee.plaque_released_on?.slice(0, 10) ?? 'Not yet'),
+        itemState(awardee, (date) => `released ${date.slice(0, 10)}`),
         awardee.grant_released_on ? awardee.grant_amount : null,
         !awardee.has_grant ? 'None' : (awardee.grant_released_on?.slice(0, 10) ?? 'Not yet'),
       ]),
@@ -319,7 +332,7 @@ export default function Reports() {
             <StatTile
               label="Awardees"
               value={report.totals.awarded}
-              detail={`${report.totals.plaques_released} of ${report.totals.plaques_due} plaques released`}
+              detail={releasedDetail(report.totals)}
             />
             <StatTile
               label="Grants released"

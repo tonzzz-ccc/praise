@@ -342,7 +342,7 @@ const confermentRecorded = safely(async function confermentRecorded(body, actor)
 // result: what records.recordRelease returns. Tells the awardee(s) about a newly released plaque
 // or grant; corrections to a release already recorded are not announced again.
 const releaseRecorded = safely(async function releaseRecorded({ newly, awardee, values }, actor) {
-  if (!newly.plaque && !newly.grant) return
+  if (!newly.plaque && !newly.certificate && !newly.grant) return
   let recipients
   if (awardee.kind === 'nomination') {
     recipients = await awardeesOf(await describeNomination(awardee.id))
@@ -357,12 +357,13 @@ const releaseRecorded = safely(async function releaseRecorded({ newly, awardee, 
   }
   const parts = []
   if (newly.plaque) parts.push('your plaque')
+  if (newly.certificate) parts.push('your certificate')
   if (newly.grant) parts.push(`your cash grant of ₱${Number(values.grant_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`)
   await notify({
     recipients,
     actor,
     type: 'release_recorded',
-    title: newly.grant ? 'Your award grant was released' : 'Your award plaque was released',
+    title: newly.grant ? 'Your award grant was released' : `Your award ${newly.plaque ? 'plaque' : 'certificate'} was released`,
     message: `The Secretariat recorded the release of ${parts.join(' and ')} for ${awardee.award_name}.`,
     nominationId: awardee.kind === 'nomination' ? awardee.id : null,
   })

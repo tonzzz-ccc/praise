@@ -517,13 +517,14 @@ async function listNominations(actor, { mine = false } = {}) {
   return rows.map((row) => ({ ...addNames(row, lookups), documented_criteria: Number(row.documented_criteria) }))
 }
 
-// Required before validating: the nomination form, plus an IPCR for an individual nominee.
-// The Secretariat sets each document's type in the checklist.
+// Required before validating: the nomination form, plus an IPCR for an individual nominee or a
+// DPCR or OPCR for a section. The Secretariat sets each document's type in the checklist.
 function findMissingDocuments(nomination, documents) {
   const has = (type) => documents.some((document) => document.doc_type === type)
   return [
     ...(has('nomination_form') ? [] : ['Nomination form']),
     ...(nomination.employee_id && !has('ipcr') ? ['IPCR'] : []),
+    ...(nomination.section_id && !has('dpcr') && !has('opcr') ? ['DPCR or OPCR'] : []),
   ]
 }
 

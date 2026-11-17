@@ -21,7 +21,7 @@ const {
 const { awardCategories, awardCycles } = require('./awardSeed')
 const { awardingColumns } = require('./awardingColumns')
 const { emisBrandingColumns } = require('./emisBrandingColumns')
-const { cycleBudgetColumn, releaseColumns, releaseTables } = require('./releaseColumns')
+const { certificateColumn, cycleBudgetColumn, releaseColumns, releaseTables } = require('./releaseColumns')
 
 const out = []
 const sql = (text, values) => out.push(values ? format(text, values) : text)
@@ -88,6 +88,10 @@ for (const table of releaseTables) {
     alterIfMissing(tableHas(table, 'column', name), `ALTER TABLE ${table} ADD COLUMN \`${name}\` ${definition}`)
   }
 }
+alterIfMissing(
+  tableHas('praise_coh_choices', 'column', certificateColumn[0]),
+  `ALTER TABLE praise_coh_choices ADD COLUMN \`${certificateColumn[0]}\` ${certificateColumn[1]}`,
+)
 alterIfMissing(
   tableHas('praise_award_cycles', 'column', cycleBudgetColumn[0]),
   `ALTER TABLE praise_award_cycles ADD COLUMN \`${cycleBudgetColumn[0]}\` ${cycleBudgetColumn[1]}`,

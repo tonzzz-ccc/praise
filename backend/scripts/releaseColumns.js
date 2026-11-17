@@ -12,6 +12,9 @@ const releaseColumns = [
 ]
 const releaseTables = ['praise_nominations', 'praise_coh_choices']
 
+// COH Choice awardees get a certificate, not a plaque or grant.
+const certificateColumn = ['certificate_released_on', 'DATE NULL AFTER conferment_recorded_by']
+
 const cycleBudgetColumn = ['budget', 'DECIMAL(12, 2) NULL AFTER ceremony_date']
 
-module.exports = { cycleBudgetColumn, releaseColumns, releaseTables }
+module.exports = { certificateColumn, cycleBudgetColumn, releaseColumns, releaseTables }

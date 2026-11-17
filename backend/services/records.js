@@ -24,6 +24,7 @@ async function getCycle(cycleId) {
 const releaseFields = (row, nameOf) => ({
   conferment_date: row.conferment_date,
   plaque_released_on: row.plaque_released_on,
+  certificate_released_on: row.certificate_released_on ?? null,
   grant_amount: money(row.grant_amount),
   grant_released_on: row.grant_released_on,
   release_recorded_by_name: row.release_recorded_by ? nameOf(row.release_recorded_by) : null,
@@ -53,6 +54,7 @@ async function listAwardees(cycle, lookups) {
       position_title: employee?.position_title ?? null,
       nominator_name: named.nominator_display_name,
       has_plaque: Boolean(category.has_plaque),
+      has_certificate: false,
       has_grant: Boolean(category.has_grant) && Number(tier?.max_amount ?? 0) > 0,
       max_grant: category.has_grant && tier ? Number(tier.max_amount) : null,
       ...releaseFields(row, nameOf),
@@ -71,10 +73,10 @@ async function listAwardees(cycle, lookups) {
       unit_name: employee?.section_name ?? null,
       position_title: employee?.position_title ?? null,
       nominator_name: 'Chief of Hospital',
-      // The COH Choice award is not in the award categories, so its plaque and grant are open:
-      // the Secretariat records whatever was given.
-      has_plaque: true,
-      has_grant: true,
+      // COH Choice awardees receive a certificate, with no plaque or cash grant.
+      has_plaque: false,
+      has_certificate: true,
+      has_grant: false,
       max_grant: null,
       ...releaseFields(row, nameOf),
     })
@@ -126,7 +128,8 @@ function cleanDate(value, label) {
   return date
 }
 
-// The Secretariat records (or corrects, or clears) when an awardee's plaque and grant were released.
+// The Secretariat records (or corrects, or clears) when an awardee's plaque, certificate and grant
+// were released.
 // Returns the updated records and what was newly released, for notifying the awardee.
 async function recordRelease(body, actor) {
   if (!KINDS.includes(body?.kind)) throw new HttpError(400, 'Choose which awardee this release is for.')
@@ -141,6 +144,8 @@ async function recordRelease(body, actor) {
 
   const plaque = cleanDate(body.plaque_released_on, 'plaque release date')
   if (plaque && !awardee.has_plaque) throw new HttpError(400, 'This award has no plaque.')
+  const certificate = cleanDate(body.certificate_released_on, 'certificate release date')
+  if (certificate && !awardee.has_certificate) throw new HttpError(400, 'This award has no certificate.')
 
   const rawAmount = body.grant_amount
   const amount = rawAmount === null || rawAmount === undefined || rawAmount === '' ? null : Number(rawAmount)
@@ -157,7 +162,8 @@ async function recordRelease(body, actor) {
     plaque_released_on: plaque,
     grant_amount: amount === null ? null : Math.round(amount * 100) / 100,
     grant_released_on: grantDate,
-    release_recorded_by: plaque || amount !== null || grantDate ? actor.id : null,
+    ...(body.kind === 'coh_choice' ? { certificate_released_on: certificate } : {}),
+    release_recorded_by: plaque || certificate || amount !== null || grantDate ? actor.id : null,
   }
   await db.query(`UPDATE ${body.kind === 'nomination' ? 'praise_nominations' : 'praise_coh_choices'} SET ? WHERE id = ?`, [values, id])
 
@@ -165,6 +171,7 @@ async function recordRelease(body, actor) {
     records: await getRecords(records.cycle.id),
     newly: {
       plaque: Boolean(plaque && !awardee.plaque_released_on),
+      certificate: Boolean(certificate && !awardee.certificate_released_on),
       grant: Boolean(grantDate && !awardee.grant_released_on),
     },
     awardee,
@@ -241,6 +248,8 @@ async function getReport(cycleId) {
       awarded: awardees.length,
       plaques_released: awardees.filter((awardee) => awardee.plaque_released_on).length,
       plaques_due: awardees.filter((awardee) => awardee.has_plaque).length,
+      certificates_released: awardees.filter((awardee) => awardee.certificate_released_on).length,
+      certificates_due: awardees.filter((awardee) => awardee.has_certificate).length,
       grants_released: released,
       grants_pending: pending,
     },

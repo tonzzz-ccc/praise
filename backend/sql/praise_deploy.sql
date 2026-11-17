@@ -185,7 +185,9 @@ CREATE TABLE IF NOT EXISTS praise_coh_choices (
   chosen_at DATETIME NOT NULL,
   conferment_date DATE NULL,
   conferment_recorded_by VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
-  -- Plaque and grant release for an awardee, recorded by the Secretariat on the Records page.
+  -- COH Choice awardees receive a certificate (no plaque or grant). The plaque and grant columns
+  -- are shared with praise_nominations and stay empty here.
+  certificate_released_on DATE NULL,
   plaque_released_on DATE NULL,
   grant_amount DECIMAL(10, 2) NULL,
   grant_released_on DATE NULL,
@@ -335,6 +337,9 @@ SET @stmt = IF(@missing, 'ALTER TABLE praise_coh_choices ADD COLUMN `grant_relea
 PREPARE s FROM @stmt; EXECUTE s; DEALLOCATE PREPARE s;
 SET @missing = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'praise_coh_choices' AND column_name = 'release_recorded_by') = 0;
 SET @stmt = IF(@missing, 'ALTER TABLE praise_coh_choices ADD COLUMN `release_recorded_by` VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL AFTER grant_released_on', 'DO 0');
+PREPARE s FROM @stmt; EXECUTE s; DEALLOCATE PREPARE s;
+SET @missing = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'praise_coh_choices' AND column_name = 'certificate_released_on') = 0;
+SET @stmt = IF(@missing, 'ALTER TABLE praise_coh_choices ADD COLUMN `certificate_released_on` DATE NULL AFTER conferment_recorded_by', 'DO 0');
 PREPARE s FROM @stmt; EXECUTE s; DEALLOCATE PREPARE s;
 SET @missing = (SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'praise_award_cycles' AND column_name = 'budget') = 0;
 SET @stmt = IF(@missing, 'ALTER TABLE praise_award_cycles ADD COLUMN `budget` DECIMAL(12, 2) NULL AFTER ceremony_date', 'DO 0');

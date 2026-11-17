@@ -16,7 +16,7 @@ const {
 const { awardCategories, awardCycles } = require('./awardSeed')
 const { awardingColumns } = require('./awardingColumns')
 const { emisBrandingColumns } = require('./emisBrandingColumns')
-const { cycleBudgetColumn, releaseColumns, releaseTables } = require('./releaseColumns')
+const { certificateColumn, cycleBudgetColumn, releaseColumns, releaseTables } = require('./releaseColumns')
 
 async function main() {
   // PRAISE now lives inside the EMIS database. The praise_* tables reference EMIS tables
@@ -120,6 +120,11 @@ async function main() {
       const [found] = await connection.query(`SHOW COLUMNS FROM ${mysql.escapeId(table)} LIKE ?`, [name])
       if (found.length === 0) await connection.query(`ALTER TABLE ${mysql.escapeId(table)} ADD COLUMN ${mysql.escapeId(name)} ${definition}`)
     }
+  }
+  const [certificateName, certificateDefinition] = certificateColumn
+  const [certificate] = await connection.query('SHOW COLUMNS FROM praise_coh_choices LIKE ?', [certificateName])
+  if (certificate.length === 0) {
+    await connection.query(`ALTER TABLE praise_coh_choices ADD COLUMN ${mysql.escapeId(certificateName)} ${certificateDefinition}`)
   }
   const [budgetName, budgetDefinition] = cycleBudgetColumn
   const [budgetColumn] = await connection.query('SHOW COLUMNS FROM praise_award_cycles LIKE ?', [budgetName])

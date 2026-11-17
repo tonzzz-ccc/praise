@@ -51,6 +51,7 @@ function ReleaseModal({ awardee, onCancel, onSaved }) {
         kind: awardee.kind,
         id: awardee.id,
         plaque_released_on: values.plaque_released_on ? values.plaque_released_on.format('YYYY-MM-DD') : null,
+        certificate_released_on: values.certificate_released_on ? values.certificate_released_on.format('YYYY-MM-DD') : null,
         grant_amount: values.grant_amount ?? null,
         grant_released_on: values.grant_released_on ? values.grant_released_on.format('YYYY-MM-DD') : null,
       })
@@ -86,52 +87,67 @@ function ReleaseModal({ awardee, onCancel, onSaved }) {
             preserve={false}
             initialValues={{
               plaque_released_on: awardee.plaque_released_on ? dayjs(awardee.plaque_released_on) : null,
+              certificate_released_on: awardee.certificate_released_on ? dayjs(awardee.certificate_released_on) : null,
               grant_amount: awardee.grant_amount ?? awardee.max_grant ?? null,
               grant_released_on: awardee.grant_released_on ? dayjs(awardee.grant_released_on) : null,
             }}
             onFinish={save}
             onValuesChange={() => setError(null)}
           >
-            <Form.Item name="plaque_released_on" label="Plaque released on" extra={awardee.has_plaque ? null : 'This award has no plaque.'}>
-              <DatePicker style={{ width: '100%' }} disabled={!awardee.has_plaque} disabledDate={notFuture} />
-            </Form.Item>
-            <Form.Item
-              name="grant_amount"
-              label="Cash grant"
-              extra={
-                !awardee.has_grant
-                  ? 'This award has no cash grant.'
-                  : awardee.max_grant !== null
-                    ? `Up to ${formatMoney(awardee.max_grant)} for this award.`
-                    : 'Enter the amount given, if any.'
-              }
-            >
-              <InputNumber
-                style={{ width: '100%' }}
-                disabled={!awardee.has_grant}
-                min={0.01}
-                max={awardee.max_grant ?? 99999999.99}
-                precision={2}
-                prefix="₱"
-                formatter={(value) => (value === '' || value === undefined ? '' : `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ','))}
-                parser={(value) => value?.replace(/,/g, '') ?? ''}
-              />
-            </Form.Item>
-            <Form.Item
-              name="grant_released_on"
-              label="Grant released on"
-              dependencies={['grant_amount']}
-              rules={[
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue('grant_amount')) return Promise.resolve()
-                    return Promise.reject(new Error('Enter the grant amount released.'))
-                  },
-                }),
-              ]}
-            >
-              <DatePicker style={{ width: '100%' }} disabled={!awardee.has_grant} disabledDate={notFuture} />
-            </Form.Item>
+            {awardee.has_certificate ? (
+              <Form.Item name="certificate_released_on" label="Certificate released on">
+                <DatePicker style={{ width: '100%' }} disabledDate={notFuture} />
+              </Form.Item>
+            ) : (
+              <Form.Item name="plaque_released_on" label="Plaque released on" extra={awardee.has_plaque ? null : 'This award has no plaque.'}>
+                <DatePicker style={{ width: '100%' }} disabled={!awardee.has_plaque} disabledDate={notFuture} />
+              </Form.Item>
+            )}
+            {awardee.has_certificate ? (
+              <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                The COH Choice Award comes with a certificate only, no plaque or cash grant.
+              </Typography.Paragraph>
+            ) : (
+              <>
+              <Form.Item
+                name="grant_amount"
+                label="Cash grant"
+                extra={
+                  !awardee.has_grant
+                    ? 'This award has no cash grant.'
+                    : awardee.max_grant !== null
+                      ? `Up to ${formatMoney(awardee.max_grant)} for this award.`
+                      : 'Enter the amount given, if any.'
+                }
+              >
+                <InputNumber
+                  style={{ width: '100%' }}
+                  disabled={!awardee.has_grant}
+                  min={0.01}
+                  max={awardee.max_grant ?? 99999999.99}
+                  precision={2}
+                  prefix="₱"
+                  formatter={(value) => (value === '' || value === undefined ? '' : `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ','))}
+                  parser={(value) => value?.replace(/,/g, '') ?? ''}
+                />
+              </Form.Item>
+              <Form.Item
+                name="grant_released_on"
+                label="Grant released on"
+                dependencies={['grant_amount']}
+                rules={[
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('grant_amount')) return Promise.resolve()
+                      return Promise.reject(new Error('Enter the grant amount released.'))
+                    },
+                  }),
+                ]}
+              >
+                <DatePicker style={{ width: '100%' }} disabled={!awardee.has_grant} disabledDate={notFuture} />
+              </Form.Item>
+              </>
+            )}
           </Form>
         </>
       )}
@@ -163,10 +179,25 @@ function AwardeesTable({ awardees, canManage, onEdit }) {
       render: (date) => (date ? formatDate(date) : <Text type="secondary">Not yet</Text>),
     },
     {
-      title: 'Plaque',
+      title: 'Plaque or certificate',
       key: 'plaque',
       width: 190,
-      render: (_, awardee) => <ReleaseState applies={awardee.has_plaque} date={awardee.plaque_released_on} />,
+      render: (_, awardee) =>
+        awardee.has_certificate ? (
+          <ReleaseState applies date={awardee.certificate_released_on}>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Certificate
+            </Text>
+          </ReleaseState>
+        ) : (
+          <ReleaseState applies={awardee.has_plaque} date={awardee.plaque_released_on}>
+            {awardee.has_plaque && (
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Plaque
+              </Text>
+            )}
+          </ReleaseState>
+        ),
     },
     {
       title: 'Cash grant',
@@ -313,7 +344,7 @@ export default function Records() {
     <>
       <PageHeader
         title="Records"
-        subtitle="Each cycle's awardees with their plaque and grant releases, and every nomination submitted."
+        subtitle="Each cycle's awardees with their plaque, certificate and grant releases, and every nomination submitted."
         extra={
           <CycleSelect
             cycles={cycles}
