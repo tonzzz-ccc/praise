@@ -141,6 +141,8 @@ export function uploadDocument(nominationId, file, criterion) {
   return request(`/nominations/${nominationId}/documents${query}`, { method: 'POST', body })
 }
 
+export const deleteDraft = (nominationId) => request(`/nominations/${nominationId}`, { method: 'DELETE' })
+
 export const deleteDocument = (nominationId, documentId) =>
   request(`/nominations/${nominationId}/documents/${documentId}`, { method: 'DELETE' })
 

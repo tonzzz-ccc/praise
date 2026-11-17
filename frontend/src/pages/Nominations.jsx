@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import { Alert, Avatar, Button, Empty, Input, Segmented, Select, Skeleton, Tag, Tooltip } from 'antd'
-import { EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Alert, Avatar, Button, Empty, Input, message, Popconfirm, Segmented, Select, Skeleton, Tag, Tooltip } from 'antd'
+import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
+import { Link, useLocation } from 'react-router-dom'
 import NominationDetails from '../components/NominationDetails'
 import PageHeader from '../components/PageHeader'
 import { useAccess } from '../hooks/useAccess'
 import { useApi } from '../hooks/useApi'
-import { listCategories, listCycles, listMyNominations } from '../services/api'
+import { deleteDraft, listCategories, listCycles, listMyNominations } from '../services/api'
 import { getStatus, nominationCriteria } from '../utils/nominations'
 import './Nominations.css'
 
@@ -32,7 +32,7 @@ const initials = (name) =>
     .join('')
     .toUpperCase()
 
-function NominationCard({ nomination, canContinue, onView }) {
+function NominationCard({ nomination, canContinue, onView, onDelete }) {
   const status = getStatus(nomination.status) ?? { label: nomination.status, color: 'default' }
   const isDraft = nomination.status === 'draft'
   const isSection = Boolean(nomination.section_id)
@@ -86,6 +86,19 @@ function NominationCard({ nomination, canContinue, onView }) {
             View
           </Button>
           {isDraft && canContinue && (
+            <Popconfirm
+              title="Delete this draft?"
+              description="The draft and its attached files are removed for good."
+              okText="Delete"
+              okButtonProps={{ danger: true }}
+              onConfirm={() => onDelete(nomination)}
+            >
+              <Button size="small" danger icon={<DeleteOutlined />}>
+                Delete
+              </Button>
+            </Popconfirm>
+          )}
+          {isDraft && canContinue && (
             <Link to={`/nominations/${nomination.id}/edit`}>
               <Button size="small" type="primary" icon={<EditOutlined />}>
                 Continue
@@ -106,7 +119,29 @@ export default function Nominations() {
   const [categoryId, setCategoryId] = useState()
   const [selectedId, setSelectedId] = useState(null)
 
-  const { data: nominations, error, loading } = useApi(listMyNominations)
+  const [messageApi, messageHolder] = message.useMessage()
+  const location = useLocation()
+
+  // A draft deleted from its edit page comes back here to confirm it. The state is then cleared
+  // without a re-render, so a page refresh does not show the message again.
+  const deletedDraft = location.state?.deletedDraft
+  useEffect(() => {
+    if (!deletedDraft) return
+    // The key keeps it to one message even when the effect runs twice (React's development mode).
+    messageApi.success({ key: `deleted-draft-${deletedDraft}`, content: `Draft No. ${deletedDraft} deleted.` })
+    window.history.replaceState({ ...window.history.state, usr: null }, '')
+  }, [deletedDraft, messageApi])
+  const { data: nominations, error, loading, reload } = useApi(listMyNominations)
+
+  async function removeDraft(nomination) {
+    try {
+      await deleteDraft(nomination.id)
+      messageApi.success(`Draft No. ${nomination.id} deleted.`)
+    } catch (deleteError) {
+      messageApi.error(deleteError.message)
+    }
+    reload()
+  }
   const { data: cycles } = useApi(listCycles)
   const { data: categories } = useApi(listCategories)
 
@@ -127,6 +162,7 @@ export default function Nominations() {
 
   return (
     <>
+      {messageHolder}
       <PageHeader
         title="Nominations"
         subtitle="Nominations you have entered, with their award, nominee and status."
@@ -212,7 +248,7 @@ export default function Nominations() {
       ) : (
         <div className="nominations-list">
           {rows.map((nomination) => (
-            <NominationCard key={nomination.id} nomination={nomination} canContinue={canCreate} onView={setSelectedId} />
+            <NominationCard key={nomination.id} nomination={nomination} canContinue={canCreate} onView={setSelectedId} onDelete={removeDraft} />
           ))}
         </div>
       )}

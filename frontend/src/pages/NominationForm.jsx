@@ -8,6 +8,7 @@ import {
   Form,
   Input,
   message,
+  Popconfirm,
   Progress,
   Radio,
   Result,
@@ -38,6 +39,7 @@ import {
   checkEligibility,
   createNomination,
   deleteDocument,
+  deleteDraft,
   documentUrl,
   getNomination,
   listCategories,
@@ -325,6 +327,18 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
 
   const saveDraft = () => validateAndSave('draft', ['category_id', 'employee_id', 'section_id'])
 
+  const removeDraft = async () => {
+    setSaving(true)
+    try {
+      await deleteDraft(draft.id)
+      // The list page shows the confirmation, since this page closes right away.
+      navigate('/nominations', { state: { deletedDraft: draft.id } })
+    } catch (deleteError) {
+      setSaveError(deleteError.message)
+      setSaving(false)
+    }
+  }
+
   const submit = async () => {
     // Each criterion needs at least one document to submit; drafts can still be saved without any.
     const missing = nominationCriteria.filter((criterion) => (filesByCriterion[criterion.key] ?? []).length === 0)
@@ -432,6 +446,19 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
 
   const actions = (
     <Flex gap={8} wrap="wrap" className="nf-actions">
+      {draft?.id && (
+        <Popconfirm
+          title="Delete this draft?"
+          description="The draft and its attached files are removed for good."
+          okText="Delete"
+          okButtonProps={{ danger: true }}
+          onConfirm={removeDraft}
+        >
+          <Button danger icon={<DeleteOutlined />} disabled={saving}>
+            Delete draft
+          </Button>
+        </Popconfirm>
+      )}
       <Button onClick={saveDraft} loading={saving}>
         Save draft
       </Button>

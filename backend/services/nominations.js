@@ -808,6 +808,18 @@ async function deleteDocument(nominationId, documentId, actor) {
   await fs.rm(document.full_path, { force: true })
 }
 
+// Deletes a draft for good, with its documents and uploaded files. Only whoever created it can,
+// and only while it is a draft (nobody else has seen it yet).
+async function deleteDraft(nominationId, actor) {
+  const nomination = await getNominationRow(nominationId)
+  assertCreator(nomination, actor)
+  if (nomination.status !== 'draft') throw new HttpError(409, 'Only drafts can be deleted.')
+
+  const [documents] = await db.query('SELECT file_path FROM praise_nomination_documents WHERE nomination_id = ?', [nomination.id])
+  await db.query('DELETE FROM praise_nominations WHERE id = ?', [nomination.id])
+  for (const document of documents) await fs.rm(path.join(UPLOAD_DIR, path.basename(document.file_path)), { force: true })
+}
+
 const DOCUMENT_TYPES = ['nomination_form', 'ipcr', 'dpcr', 'opcr', 'award_commendation', 'publication', 'photo', 'testimonial', 'other']
 const DISQUALIFICATION_REASONS = ['incomplete_documents', 'misrepresentation', 'special_favor']
 const alreadyReviewed = () => new HttpError(409, 'This nomination has already been reviewed. Reload the page.')
@@ -917,6 +929,7 @@ module.exports = {
   HttpError,
   UPLOAD_DIR,
   addDocument,
+  deleteDraft,
   createCategory,
   setCategoryOrder,
   createCycle,

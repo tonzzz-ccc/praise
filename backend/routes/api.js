@@ -274,6 +274,11 @@ router.put('/nominations/:id', requirePermission('nominations.create'), async (r
   res.json(nomination)
 })
 
+router.delete('/nominations/:id', requirePermission('nominations.create'), async (req, res) => {
+  await nominations.deleteDraft(req.params.id, req.user)
+  res.status(204).end()
+})
+
 router.post('/nominations/:id/documents', requirePermission('nominations.create'), upload.single('file'), async (req, res) => {
   if (!req.file) throw new nominations.HttpError(400, 'Choose a file to attach.')
   res.status(201).json(await nominations.addDocument(req.params.id, req.file, req.query.criterion, req.user))
