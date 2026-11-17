@@ -1,8 +1,10 @@
 // Descriptions and behavioral indicators are copied word for word from the official nomination forms.
+// Dangal ng MTRC is two awards, Level I and Level II, so each level has its own winner.
 const awardCategories = [
   {
     code: 'DANGAL',
-    name: 'Dangal ng MTRC Award',
+    sort_order: 1,
+    name: 'Dangal ng MTRC Award Level I',
     description:
       'This award is conferred to regular employee belonging to the second and first level for performance of an extraordinary act or public service and consistent demonstration of exemplary ethical behaviour based on the observance of the eight norms of behaviour provided under RA No. 6713',
     applies_to: 'permanent',
@@ -18,13 +20,32 @@ const awardCategories = [
       'Teamwork',
       'Excellence',
     ],
-    tiers: [
-      { tier_label: 'Level I', max_amount: 5000, salary_grade_min: 1, salary_grade_max: 11 },
-      { tier_label: 'Level II', max_amount: 10000, salary_grade_min: 12, salary_grade_max: null },
+    tiers: [{ tier_label: 'Level I', max_amount: 5000, salary_grade_min: 1, salary_grade_max: 11 }],
+  },
+  {
+    code: 'DANGAL_NG_MTRC_AWARD_LEVEL_II',
+    sort_order: 2,
+    name: 'Dangal ng MTRC Award Level II',
+    description:
+      'This award is conferred to regular employee belonging to the second and first level for performance of an extraordinary act or public service and consistent demonstration of exemplary ethical behaviour based on the observance of the eight norms of behaviour provided under RA No. 6713',
+    applies_to: 'permanent',
+    nominee_type: 'individual',
+    has_grant: 1,
+    behavioral_indicators: [
+      'Leadership',
+      'Critical Thinking',
+      'Integrity',
+      'God-centeredness',
+      'Nurturing',
+      'Innovative',
+      'Teamwork',
+      'Excellence',
     ],
+    tiers: [{ tier_label: 'Level II', max_amount: 10000, salary_grade_min: 12, salary_grade_max: null }],
   },
   {
     code: 'CUSTOMER_SVC',
+    sort_order: 3,
     name: 'Excellence in Customer Service Award',
     description:
       'This award recognizes a Section/Committee with high focus of customer service programs in compliance with the MTRC Quality Policy which aims to continually improve quality management systems to the satisfaction of its clients and stakeholder',
@@ -40,10 +61,11 @@ const awardCategories = [
       'Innovation in addressing client concerns and improving service processes.',
       'Professionalism, courtesy, and accountability in all customer interactions.',
     ],
-    tiers: [{ tier_label: 'Standard', max_amount: 10000, salary_grade_min: null, salary_grade_max: null }],
+    tiers: [{ tier_label: 'Standard', max_amount: 20000, salary_grade_min: null, salary_grade_max: null }],
   },
   {
     code: 'AGAP_SERBISYO',
+    sort_order: 4,
     name: 'Agap Serbisyo',
     description:
       'This award shall be given to employee who has demonstrated dedication to work by always being on time. He/She commits and delivers required outputs in a timely manner.',
@@ -61,6 +83,7 @@ const awardCategories = [
   },
   {
     code: 'SULONG_KALINANGAN',
+    sort_order: 5,
     name: 'Sulong Kalinangan',
     description:
       "This award is granted to employee who exhibited passion for continuous learning and development by engaging in continuing formal education and/or non-formal training's. Given if he/she was able to apply his/her learning's to current practices of the Center resulting in more responsive, effective and efficient quality management system.",
@@ -78,6 +101,7 @@ const awardCategories = [
   },
   {
     code: 'GAWAD_HIRAYA',
+    sort_order: 6,
     name: 'Gawad Hiraya',
     description:
       "This award is granted to employee who have contributed to the continual improvement of the Center's quality management systems which resulted to the achivement of recognition, certification and accreditation from external bodies (ISO, PGS, PRIME HRM etc.)",
