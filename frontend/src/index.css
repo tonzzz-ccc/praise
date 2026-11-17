@@ -1,0 +1,413 @@
+html, body, #root {
+  margin: 0;
+  min-height: 100vh;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ---- Sidebar (Refined Navy) ---- */
+.praise-sider.ant-layout-sider,
+.praise-sider .ant-menu-dark {
+  background: transparent;
+}
+
+.praise-sider.ant-layout-sider {
+  background: linear-gradient(180deg, #0b1f3a 0%, #001529 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Keep the sidebar fixed while its own menu scrolls if it is taller than the viewport. */
+.praise-sider .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+}
+
+.praise-sider-brand {
+  flex-shrink: 0;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  overflow: hidden;
+}
+
+.ant-layout-sider-collapsed .praise-sider-brand {
+  justify-content: center;
+  padding: 0;
+}
+
+.praise-sider-brand-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #1677ff;
+  color: #fff;
+  font-size: 20px;
+  box-shadow: 0 6px 16px rgba(9, 88, 217, 0.35);
+}
+
+.praise-sider-brand-logo {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+/* Settings > System Settings: each logo previewed on the background it is shown on. */
+.system-settings-logo-preview {
+  flex-shrink: 0;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #0b1f3a 0%, #001529 100%);
+}
+
+/* Login logos sit on the login page's blue panel. */
+.system-settings-logo-preview.is-light {
+  background: linear-gradient(135deg, #0958d9 0%, #1677ff 100%);
+}
+
+/* The login background, previewed as a wide thumbnail under the same blue tint as the login page. */
+.system-settings-logo-preview.is-wide {
+  position: relative;
+  width: 160px;
+  overflow: hidden;
+}
+
+.system-settings-logo-preview.is-wide img {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+.system-settings-logo-preview.is-wide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(0, 21, 41, 0.88), rgba(9, 88, 217, 0.78));
+}
+
+.system-settings-logo-preview img {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+.praise-sider-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.praise-sider-brand-name {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+
+.praise-sider-brand-tagline {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.praise-sider-menu {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-bottom: 12px;
+}
+
+.praise-sider .ant-menu .ant-menu-item-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 20px 24px 8px;
+}
+
+.praise-sider .ant-menu .ant-menu-item,
+.praise-sider .ant-menu .ant-menu-submenu-title {
+  position: relative;
+}
+
+.praise-sider .ant-menu .ant-menu-item-selected {
+  font-weight: 600;
+}
+
+/* Blue accent bar on the current page. */
+.praise-sider .ant-menu .ant-menu-item-selected::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border: 0;
+  border-radius: 0 4px 4px 0;
+  background: #1677ff;
+  opacity: 1;
+  transform: none;
+}
+
+.praise-sider .ant-menu .ant-menu-submenu-title {
+  font-weight: 600;
+}
+
+.praise-sider-footer {
+  flex-shrink: 0;
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.praise-sider-collapse {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.praise-sider-collapse:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.praise-sider-collapse:focus-visible {
+  outline: 2px solid #1677ff;
+  outline-offset: 2px;
+}
+
+/* Phones: the sidebar opens as a drawer with the same navy look. */
+.praise-sider-drawer .ant-drawer-section,
+.praise-sider-drawer .ant-drawer-content {
+  background: linear-gradient(180deg, #0b1f3a 0%, #001529 100%);
+}
+
+.praise-sider-drawer .praise-sider-menu {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ---- Header (Contextual Bar) ---- */
+.praise-header.ant-layout-header {
+  height: 64px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  line-height: normal;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+@media (max-width: 575px) {
+  .praise-header.ant-layout-header {
+    height: 56px;
+    padding: 0 12px;
+    gap: 8px;
+  }
+}
+
+.praise-header-icon-button.ant-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: #4b5563;
+}
+
+.praise-header-breadcrumb {
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.praise-header-breadcrumb li:last-child {
+  color: #111827;
+  font-weight: 600;
+}
+
+.praise-header-cycle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border: 1px solid #d1fae5;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.praise-header-cycle-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+}
+
+.praise-header-preview .ant-select-prefix {
+  color: #6b7280;
+}
+
+.praise-header-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 8px 4px 4px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.praise-header-account:hover {
+  background: #f5f5f5;
+}
+
+.praise-header-account:focus-visible {
+  outline: 2px solid #1677ff;
+  outline-offset: 2px;
+}
+
+.praise-header-avatar.ant-avatar {
+  flex-shrink: 0;
+  background: #e6f4ff;
+  color: #1677ff;
+}
+
+.praise-header-account-text {
+  display: flex;
+  flex-direction: column;
+  max-width: 180px;
+  line-height: 1.25;
+}
+
+.praise-header-account-name,
+.praise-header-account-role {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.praise-header-account-name {
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.praise-header-account-role {
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.praise-header-account-caret {
+  color: #9ca3af;
+  font-size: 10px;
+}
+
+/* ---- Responsive page basics ---- */
+@media (max-width: 575px) {
+  .page-header > .ant-btn,
+  .page-header > a,
+  .page-header > a > .ant-btn {
+    width: 100%;
+  }
+
+  .page-header .ant-typography h3,
+  .page-header h3.ant-typography {
+    font-size: 20px;
+  }
+
+  /* Filter rows: each dropdown takes the full width. */
+  .page-filters > .ant-select {
+    width: 100% !important;
+  }
+
+  /* Tables: tighter cells so more fits before scrolling sideways. */
+  .ant-table-wrapper .ant-table-thead > tr > th,
+  .ant-table-wrapper .ant-table-tbody > tr > td {
+    padding: 10px 8px;
+  }
+
+  /* Descriptions in drawers stack label over value. */
+  .ant-drawer .ant-descriptions-row {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ant-drawer .ant-descriptions-item-label,
+  .ant-drawer .ant-descriptions-item-content {
+    display: block;
+    width: 100%;
+  }
+}
+
+/* New Nomination: a compact Attach Supporting Documents dropzone — the upload icon and prompt on
+   one line, about the height of an attached-file row. The dashed border and hover/drag-over states
+   are antd defaults and are kept. The helper text sits below the dropzone (Form.Item extra). */
+.nomination-docs-item .ant-upload.ant-upload-drag .ant-upload-btn {
+  padding: 8px 16px;
+}
+
+.nomination-docs-item .ant-upload-drag-container {
+  display: block;
+}
+
+.nomination-docs-dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.nomination-docs-dropzone .anticon {
+  color: #1677ff;
+  font-size: 18px;
+}
+
+.nomination-docs-dropzone .nomination-docs-text {
+  font-size: 14px;
+}
+
+/* Clear spacing so the helper text never touches the dropzone border. */
+.nomination-docs-item .ant-form-item-extra {
+  margin-top: 6px;
+}

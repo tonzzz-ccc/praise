@@ -1,0 +1,133 @@
+{
+  "projectId": "3abd97b0-7897-490a-8e1e-096b8678c4df",
+  "targets": {
+    "sidebar": {
+      "route": "/dashboard (MainLayout sidebar)",
+      "baselineDraftId": "45b90faf-dc1b-47f5-81a4-9f99efc2bb23",
+      "activeDraftId": "245d642b-70fc-4821-87c1-783821f50397",
+      "branches": [
+        {
+          "draftId": "245d642b-70fc-4821-87c1-783821f50397",
+          "description": "A Refined Navy"
+        },
+        {
+          "draftId": "8f3fb278-5d08-43fd-868d-bb9a997317e8",
+          "description": "B Clean Light"
+        },
+        {
+          "draftId": "cabaf7f1-a614-400b-a044-6d3079214b59",
+          "description": "C Floating Brand Blue"
+        }
+      ],
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        "frontend/src/layouts/MainLayout.jsx",
+        "frontend/src/config/navigation.js",
+        "frontend/src/index.css",
+        "frontend/src/pages/Dashboard.jsx",
+        "frontend/src/components/PageHeader.jsx",
+        ".superdesign/init/theme.md"
+      ]
+    },
+    "header": {
+      "route": "/dashboard (MainLayout header)",
+      "baselineDraftId": "245d642b-70fc-4821-87c1-783821f50397",
+      "activeDraftId": "0c76e520-5f26-4fc7-8517-58a0a1b8c09f",
+      "branches": [
+        {
+          "draftId": "0c76e520-5f26-4fc7-8517-58a0a1b8c09f",
+          "description": "Contextual Bar"
+        },
+        {
+          "draftId": "1f1bc649-66b7-4948-b96e-59805ccb7577",
+          "description": "Floating Glass"
+        }
+      ],
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        "frontend/src/layouts/MainLayout.jsx",
+        "frontend/src/config/navigation.js",
+        "frontend/src/index.css",
+        "frontend/src/pages/Dashboard.jsx",
+        "frontend/src/components/PageHeader.jsx",
+        ".superdesign/init/theme.md"
+      ]
+    },
+    "dashboard": {
+      "route": "/dashboard (content)",
+      "baselineDraftId": "0c76e520-5f26-4fc7-8517-58a0a1b8c09f",
+      "activeDraftId": "87821277-d80d-47aa-8a24-d6339a8525b8",
+      "branches": [
+        {
+          "draftId": "b9a8c3f9-5141-4e0d-86e2-a37514f977f7",
+          "description": "EMIS Overview"
+        },
+        {
+          "draftId": "87821277-d80d-47aa-8a24-d6339a8525b8",
+          "description": "Hero + Insights"
+        }
+      ],
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        "frontend/src/layouts/MainLayout.jsx",
+        "frontend/src/index.css",
+        "frontend/src/pages/Dashboard.jsx",
+        "frontend/src/components/PageHeader.jsx",
+        "frontend/src/pages/AccessManagement.css",
+        ".superdesign/init/theme.md"
+      ]
+    },
+    "awardCategories": {
+      "route": "/award-categories",
+      "baselineDraftId": "10d0e86c-d4fc-4fd1-ab8b-2cf6a986d59d",
+      "activeDraftId": "b2a8f384-ab7e-4227-8ec8-32aee4a7db87",
+      "branches": [
+        {
+          "draftId": "b2a8f384-ab7e-4227-8ec8-32aee4a7db87",
+          "description": "Card Grid"
+        },
+        {
+          "draftId": "bad1b19c-e7b5-493f-bf07-82ef75270278",
+          "description": "Refined Table"
+        }
+      ],
+      "contextFiles": [
+        "frontend/src/pages/AwardCategories.jsx",
+        "frontend/src/components/PageHeader.jsx",
+        "frontend/src/index.css",
+        "frontend/src/pages/AccessManagement.css",
+        ".superdesign/design-system.md"
+      ]
+    },
+    "nominations": {
+      "route": "/nominations",
+      "baselineDraftId": "abf74bc6-7e6d-4bdf-9472-b5942d063336",
+      "activeDraftId": "eea935a9-e75a-4f58-8230-8bf90931035e",
+      "branches": [
+        {
+          "draftId": "17653d4f-9689-4cfb-adb9-a88331f4f374",
+          "description": "Summary + Refined Table"
+        },
+        {
+          "draftId": "eea935a9-e75a-4f58-8230-8bf90931035e",
+          "description": "Status Tabs + Cards"
+        }
+      ]
+    },
+    "nominationForm": {
+      "route": "/nominations/new",
+      "baselineDraftId": "81ea2a52-81ee-476f-997c-f744d5e31f68",
+      "activeDraftId": "c8fa348e-111a-4108-bcdd-463cf38e38b7",
+      "branches": [
+        {
+          "draftId": "c8fa348e-111a-4108-bcdd-463cf38e38b7",
+          "description": "Guided Steps + Summary Rail"
+        },
+        {
+          "draftId": "8baf5a0b-fa1b-4fd8-9323-7f69f6c0b9c2",
+          "description": "Single Column Polished"
+        }
+      ]
+    }
+  }
+}

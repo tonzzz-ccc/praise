@@ -1,0 +1,3 @@
+.env
+.superdesign/tmp/
+.playwright-mcp/

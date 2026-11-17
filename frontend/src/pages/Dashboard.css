@@ -1,0 +1,378 @@
+/* Dashboard (Hero + Insights). EMIS-style cards: white, 16px radius, hairline border, soft shadow. */
+.dashboard-section {
+  margin-bottom: 20px;
+}
+
+.dashboard-card {
+  padding: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* ---- Hero ---- */
+.dashboard-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0b1f3a 0%, #1677ff 100%);
+  box-shadow: 0 10px 25px -5px rgba(11, 31, 58, 0.25);
+  color: #fff;
+}
+
+.dashboard-hero-watermark {
+  position: absolute;
+  right: -24px;
+  bottom: -32px;
+  font-size: 220px;
+  color: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+.dashboard-hero-body {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 32px;
+}
+
+.dashboard-hero-main {
+  flex: 1 1 420px;
+  max-width: 680px;
+}
+
+.dashboard-hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.dashboard-hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-hero-tag.is-open {
+  border-color: rgba(52, 211, 153, 0.45);
+  background: rgba(16, 185, 129, 0.2);
+  color: #d1fae5;
+}
+
+.dashboard-hero-title {
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.dashboard-hero-dates {
+  margin: 0 0 22px;
+  color: rgba(219, 234, 254, 0.75);
+  font-size: 15px;
+}
+
+.dashboard-hero-dates strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.dashboard-hero-button.ant-btn {
+  border: 0;
+  color: #0958d9;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.dashboard-hero-button.ant-btn:hover {
+  background: #eff6ff;
+  color: #0958d9;
+}
+
+.dashboard-hero-counter {
+  flex: 0 1 300px;
+  min-width: 240px;
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+.dashboard-hero-count {
+  color: rgba(219, 234, 254, 0.85);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dashboard-hero-count span {
+  color: #fff;
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-hero-caption {
+  margin: 6px 0 14px;
+  color: rgba(219, 234, 254, 0.6);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.dashboard-hero-progress {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.dashboard-hero-progress div {
+  height: 100%;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+  transition: width 0.6s ease;
+}
+
+.dashboard-hero-range {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  color: rgba(219, 234, 254, 0.7);
+  font-size: 11px;
+}
+
+/* ---- Insight cards ---- */
+.dashboard-insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.dashboard-insight {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dashboard-insight:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+}
+
+.dashboard-insight-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.dashboard-chip {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 18px;
+}
+
+.dashboard-chip.is-blue {
+  background: linear-gradient(135deg, #0958d9, #1677ff);
+}
+
+.dashboard-chip.is-gold {
+  background: linear-gradient(135deg, #d48806, #faad14);
+}
+
+.dashboard-chip.is-purple {
+  background: linear-gradient(135deg, #531dab, #722ed1);
+}
+
+.dashboard-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.dashboard-badges .ant-tag {
+  margin: 0;
+}
+
+.dashboard-label {
+  margin-bottom: 4px;
+  color: #9ca3af;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-value {
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-value small {
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dashboard-value.is-muted {
+  color: #9ca3af;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.dashboard-note {
+  margin-top: 12px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.dashboard-accent {
+  color: #1677ff;
+  font-weight: 600;
+}
+
+.dashboard-mini-bar {
+  height: 6px;
+  margin-top: 16px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f3f4f6;
+}
+
+.dashboard-mini-bar div {
+  height: 100%;
+  border-radius: 999px;
+  background: #52c41a;
+}
+
+/* ---- Nominees per award ---- */
+.dashboard-awards {
+  padding: 0;
+  overflow: hidden;
+}
+
+.dashboard-awards-header {
+  padding: 18px 24px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.dashboard-awards-header h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.dashboard-awards-header p {
+  margin: 2px 0 0;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.dashboard-awards-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.dashboard-award-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.dashboard-award-name {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dashboard-award-count {
+  flex-shrink: 0;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-award-count small {
+  color: #9ca3af;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.dashboard-award-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #f3f4f6;
+}
+
+.dashboard-award-track div {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #0958d9, #1677ff);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-awards-empty {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 12px;
+  text-align: center;
+}
+
+@media (max-width: 575px) {
+  .dashboard-hero-body {
+    padding: 22px;
+  }
+
+  .dashboard-hero-counter {
+    flex-basis: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-insight,
+  .dashboard-hero-progress div,
+  .dashboard-award-track div {
+    transition: none;
+  }
+
+  .dashboard-insight:hover {
+    transform: none;
+  }
+}

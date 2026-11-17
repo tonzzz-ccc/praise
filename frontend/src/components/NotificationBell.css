@@ -1,0 +1,108 @@
+.praise-notifications-header {
+  padding: 10px 12px 10px 16px;
+  border-bottom: 1px solid rgba(5, 5, 5, 0.06);
+}
+
+.praise-notifications-list {
+  max-height: min(480px, 70vh);
+  overflow-y: auto;
+}
+
+.praise-notification {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 12px 12px 16px;
+  border-bottom: 1px solid rgba(5, 5, 5, 0.04);
+  cursor: pointer;
+  outline: none;
+  transition: background 0.15s;
+}
+
+.praise-notification:last-child {
+  border-bottom: 0;
+}
+
+.praise-notification:hover,
+.praise-notification:focus-visible {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.praise-notification.is-unread {
+  background: rgba(22, 119, 255, 0.05);
+}
+
+.praise-notification.is-unread:hover,
+.praise-notification.is-unread:focus-visible {
+  background: rgba(22, 119, 255, 0.09);
+}
+
+.praise-notification-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 15px;
+}
+
+.praise-notification-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.praise-notification-title {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.praise-notification-message {
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(0, 0, 0, 0.65);
+  overflow-wrap: anywhere;
+}
+
+.praise-notification-meta {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.praise-notification-side {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.praise-notification-dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+}
+
+.praise-notification-remove.ant-btn {
+  color: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+}
+
+.praise-notification:hover .praise-notification-remove.ant-btn,
+.praise-notification:focus-within .praise-notification-remove.ant-btn {
+  opacity: 1;
+}
+
+/* Touch screens have no hover, so the remove button is always shown there. */
+@media (hover: none) {
+  .praise-notification-remove.ant-btn {
+    opacity: 1;
+  }
+}
