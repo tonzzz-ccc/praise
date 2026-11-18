@@ -201,6 +201,17 @@ export const markNotificationRead = (id) => sendJson('POST', `/notifications/${i
 export const markAllNotificationsRead = () => sendJson('POST', '/notifications/read-all', {})
 export const deleteNotification = (id) => request(`/notifications/${id}`, { method: 'DELETE' })
 
+// Opens the live-notification WebSocket for the signed-in tab, or returns null when signed out.
+// The token goes as the second subprotocol, since a WebSocket cannot carry an Authorization header.
+export function openNotificationSocket() {
+  const token = getToken()
+  if (!token) return null
+  const base = new URL(API_BASE || window.location.origin)
+  base.protocol = base.protocol === 'https:' ? 'wss:' : 'ws:'
+  base.pathname = '/api/ws'
+  return new WebSocket(base.href, ['praise', token])
+}
+
 // Records and Reports.
 export const getRecords = (cycleId) => request(`/records?cycle_id=${cycleId}`)
 export const recordRelease = (data) => sendJson('PUT', '/records/release', data)

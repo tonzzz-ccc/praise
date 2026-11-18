@@ -10,8 +10,9 @@ export default defineConfig({
     host: true,
     // The browser calls /api on the same origin; Vite forwards it to the backend, so no CORS
     // is needed. Override the target with PRAISE_API_URL when the backend is elsewhere.
+    // ws: true also forwards the live-notification WebSocket (/api/ws).
     proxy: {
-      '/api': process.env.PRAISE_API_URL ?? 'http://127.0.0.1:5050',
+      '/api': { target: process.env.PRAISE_API_URL ?? 'http://127.0.0.1:5050', ws: true },
     },
   },
   // Same for `vite preview` (serving a production build locally).

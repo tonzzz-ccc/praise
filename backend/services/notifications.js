@@ -4,6 +4,7 @@
 const { db } = require('../config/db')
 const { getEmployeeNames, listSections } = require('./emis')
 const { HttpError } = require('./nominations')
+const realtime = require('./realtime')
 
 const BUILT_IN_ADMIN_ID = 'builtin-admin'
 const PAGE_SIZE = 30
@@ -49,6 +50,8 @@ async function notify({ recipients, permissions, actor, type, title, message, li
       'INSERT INTO praise_notifications (recipient_id, type, title, message, link, nomination_id, actor_id, actor_name) VALUES ?',
       [rows],
     )
+    // Open tabs of the recipients update their bell at once.
+    void realtime.pushUnread(ids)
   } catch (error) {
     console.error(`Could not send the "${type}" notification:`, error)
   }
@@ -99,17 +102,20 @@ async function markRead(id, user) {
     [id, user.id],
   )
   if (result.affectedRows === 0) throw new HttpError(404, 'Notification not found.')
+  void realtime.pushUnread([user.id])
   return { unread: await countUnread(user) }
 }
 
 async function markAllRead(user) {
   await db.query('UPDATE praise_notifications SET is_read = 1, read_at = NOW() WHERE recipient_id = ? AND is_read = 0', [user.id])
+  void realtime.pushUnread([user.id])
   return { unread: 0 }
 }
 
 async function remove(id, user) {
   const [result] = await db.query('DELETE FROM praise_notifications WHERE id = ? AND recipient_id = ?', [id, user.id])
   if (result.affectedRows === 0) throw new HttpError(404, 'Notification not found.')
+  void realtime.pushUnread([user.id])
   return { unread: await countUnread(user) }
 }
 

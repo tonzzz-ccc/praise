@@ -22,11 +22,17 @@ import {
   listNotifications,
   markAllNotificationsRead,
   markNotificationRead,
+  openNotificationSocket,
 } from '../services/api'
 import { formatRelativeTime } from '../utils/format'
 import './NotificationBell.css'
 
-const POLL_MS = 30 * 1000
+// Updates arrive live over a WebSocket. Only while it is down does the bell check by itself, every
+// 2 minutes, and it reconnects with a growing delay (1 s, 2 s, 4 s … up to 30 s).
+const FALLBACK_POLL_MS = 2 * 60 * 1000
+const RETRY_MIN_MS = 1000
+const RETRY_MAX_MS = 30 * 1000
+const SIGNED_OUT = 4001
 
 // Icon and accent color per notification type. Colors are antd preset token names.
 const TYPE_LOOK = {
@@ -116,7 +122,7 @@ export default function NotificationBell() {
   const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  // Read by the refresh timer, which should not restart each time the panel opens or closes.
+  // Read by the live-update handler, which should not restart each time the panel opens or closes.
   const openRef = useRef(false)
 
   const loadList = useCallback(async () => {
@@ -134,27 +140,93 @@ export default function NotificationBell() {
     }
   }, [])
 
-  // The unread count refreshes every 30 seconds while the tab is visible, and right away when the
-  // tab comes back into view. The open list refreshes along with it.
+  // Live updates: the server sends { type: 'unread', count } whenever this user's unread count
+  // changes (a new notification, or one read or removed in another tab). The open list reloads too.
   useEffect(() => {
     let isCurrent = true
+    let socket = null
+    let retryTimer = null
+    let retryDelay = RETRY_MIN_MS
+    let pollTimer = null
+
     const refresh = async () => {
-      if (document.visibilityState !== 'visible') return
       if (openRef.current) return loadList()
       try {
         const { unread: count } = await getUnreadNotificationCount()
         if (isCurrent) setUnread(count)
       } catch {
-        // A missed refresh is retried on the next tick.
+        // A missed refresh is retried later.
       }
     }
+
+    const startPolling = () => {
+      if (!pollTimer) pollTimer = setInterval(() => document.visibilityState === 'visible' && refresh(), FALLBACK_POLL_MS)
+    }
+    const stopPolling = () => {
+      clearInterval(pollTimer)
+      pollTimer = null
+    }
+
+    const connect = () => {
+      clearTimeout(retryTimer)
+      if (!isCurrent || socket) return
+      try {
+        socket = openNotificationSocket()
+      } catch {
+        socket = null
+      }
+      if (!socket) return startPolling()
+
+      socket.onopen = () => {
+        retryDelay = RETRY_MIN_MS
+        stopPolling()
+      }
+      socket.onmessage = (event) => {
+        let data
+        try {
+          data = JSON.parse(event.data)
+        } catch {
+          return
+        }
+        if (data.type !== 'unread' || !isCurrent) return
+        setUnread(data.count)
+        if (openRef.current) loadList()
+      }
+      socket.onclose = (event) => {
+        socket = null
+        if (!isCurrent || event.code === SIGNED_OUT) return
+        startPolling()
+        retryTimer = setTimeout(connect, retryDelay)
+        retryDelay = Math.min(retryDelay * 2, RETRY_MAX_MS)
+      }
+    }
+
+    // Coming back to the tab (or waking the PC) reconnects at once instead of waiting for the retry.
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return
+      if (!socket) {
+        retryDelay = RETRY_MIN_MS
+        connect()
+        refresh()
+      }
+    }
+
     refresh()
-    const timer = setInterval(refresh, POLL_MS)
-    document.addEventListener('visibilitychange', refresh)
+    connect()
+    document.addEventListener('visibilitychange', onVisible)
     return () => {
       isCurrent = false
-      clearInterval(timer)
-      document.removeEventListener('visibilitychange', refresh)
+      clearTimeout(retryTimer)
+      stopPolling()
+      document.removeEventListener('visibilitychange', onVisible)
+      if (socket) {
+        const closing = socket
+        closing.onclose = null
+        closing.onmessage = null
+        // Closing one that is still connecting logs a browser warning, so let it open first.
+        if (closing.readyState === WebSocket.CONNECTING) closing.onopen = () => closing.close()
+        else closing.close()
+      }
     }
   }, [loadList])
 

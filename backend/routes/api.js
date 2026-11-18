@@ -11,6 +11,7 @@ const committee = require('../services/committee')
 const { listActiveEmployees, listAllEmployees, listImmediateSupervisors, listSections } = require('../services/emis')
 const nominations = require('../services/nominations')
 const notifications = require('../services/notifications')
+const realtime = require('../services/realtime')
 const records = require('../services/records')
 const screening = require('../services/screening')
 const systemSettings = require('../services/systemSettings')
@@ -78,7 +79,9 @@ router.post('/auth/login', async (req, res) => {
 })
 
 router.post('/auth/logout', async (req, res) => {
-  await auth.logout(getToken(req))
+  const token = getToken(req)
+  await auth.logout(token)
+  realtime.closeSession(token)
   res.status(204).end()
 })
 

@@ -4,6 +4,7 @@ const multer = require('multer')
 const { db } = require('./config/db')
 const { cors } = require('./middleware/cors')
 const apiRoutes = require('./routes/api')
+const realtime = require('./services/realtime')
 
 const app = express()
 const PORT = process.env.PORT || 5050
@@ -35,7 +36,7 @@ app.use((error, req, res, next) => {
   return res.status(500).json({ message: 'Something went wrong on the server.' })
 })
 
-app.listen(PORT, HOST, async () => {
+const server = app.listen(PORT, HOST, async () => {
   console.log(`PRAISE API running on http://${HOST}:${PORT}`)
   try {
     await db.query('SELECT 1')
@@ -44,3 +45,6 @@ app.listen(PORT, HOST, async () => {
     console.error('MySQL connection failed:', error.message)
   }
 })
+
+// Live notification updates (WebSocket at /api/ws) share the API's port.
+realtime.attach(server)
