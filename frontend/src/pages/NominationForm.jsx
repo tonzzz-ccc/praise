@@ -35,6 +35,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import EligibilityPanel from '../components/EligibilityPanel'
 import PageHeader from '../components/PageHeader'
 import { useApi } from '../hooks/useApi'
+import { useUnsavedChangesGuard } from '../hooks/useUnsavedChangesGuard'
 import {
   checkEligibility,
   createNomination,
@@ -50,7 +51,7 @@ import {
   updateNomination,
   uploadDocument,
 } from '../services/api'
-import { formatTier, todayString } from '../utils/format'
+import { formatDate, formatTier, todayString } from '../utils/format'
 import { nominationCriteria, nominatorTypeOptions } from '../utils/nominations'
 import './NominationForm.css'
 
@@ -154,6 +155,9 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
   const [saveError, setSaveError] = useState(null)
   const [showDocumentErrors, setShowDocumentErrors] = useState(false)
   const [messageApi, messageHolder] = message.useMessage()
+  // Set by any edit to the fields or attachments, cleared once saved.
+  const [dirty, setDirty] = useState(false)
+  const { contextHolder: leaveGuardHolder, allowNavigation } = useUnsavedChangesGuard(dirty && !saved)
 
   // Checks each file's type and size, shows a clear error, and keeps valid files in the list
   // without uploading yet (they are uploaded with the nomination on save).
@@ -255,6 +259,7 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
   const eligibility = eligibilityLoading || eligibilityError ? null : eligibilityData
 
   const handleValuesChange = (changed) => {
+    setDirty(true)
     if ('category_id' in changed) {
       form.setFieldsValue({ employee_id: undefined, section_id: undefined })
     }
@@ -263,8 +268,10 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
     }
   }
 
-  const setCriterionFiles = (key) => ({ fileList }) =>
+  const setCriterionFiles = (key) => ({ fileList }) => {
+    setDirty(true)
     setFilesByCriterion((previous) => ({ ...previous, [key]: fileList }))
+  }
 
   const saveDocuments = async (nominationId) => {
     const allFiles = nominationCriteria.flatMap((criterion) =>
@@ -307,6 +314,7 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
       if (status === 'submitted') {
         nomination = await updateNomination(nomination.id, { ...payload, status })
       }
+      setDirty(false)
       setSaved(nomination)
     } catch (error) {
       setSaveError(error.message)
@@ -331,6 +339,7 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
     setSaving(true)
     try {
       await deleteDraft(draft.id)
+      allowNavigation()
       // The list page shows the confirmation, since this page closes right away.
       navigate('/nominations', { state: { deletedDraft: draft.id } })
     } catch (deleteError) {
@@ -366,6 +375,7 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
     form.resetFields()
     setFilesByCriterion(groupSavedDocuments(null))
     setShowDocumentErrors(false)
+    setDirty(false)
     setSaved(null)
     navigate('/nominations/new')
   }
@@ -408,8 +418,8 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
   const submitBlockers = [
     !windowOpen &&
       (windowClosed
-        ? `The nomination window closed on ${cycle.nomination_end}. ${extendWindowHint}`
-        : `The nomination window opens on ${cycle.nomination_start}.`),
+        ? `The nomination window closed on ${formatDate(cycle.nomination_end)}. ${extendWindowHint}`
+        : `The nomination window opens on ${formatDate(cycle.nomination_start)}.`),
     !hasNominee && (isSectionAward ? 'Select a section, committee or unit.' : 'Select an award and a nominee.'),
     eligibilityError && 'The eligibility check could not be completed. Reload the page and try again.',
     eligibility && !eligibility.is_eligible && 'The nominee does not meet a requirement in the eligibility check.',
@@ -471,6 +481,7 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
   return (
     <>
       {messageHolder}
+      {leaveGuardHolder}
       <PageHeader title={title} subtitle="Complete each section and attach documents per criterion, then submit to the Secretariat." />
 
       <Form form={form} layout="vertical" requiredMark initialValues={draft ?? undefined} onValuesChange={handleValuesChange}>
@@ -489,8 +500,8 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
                 type="info"
                 title={
                   windowClosed
-                    ? `${cycle.name} nominations closed on ${cycle.nomination_end}.`
-                    : `${cycle.name} nominations open ${cycle.nomination_start} to ${cycle.nomination_end}.`
+                    ? `${cycle.name} nominations closed on ${formatDate(cycle.nomination_end)}.`
+                    : `${cycle.name} nominations open ${formatDate(cycle.nomination_start)} to ${formatDate(cycle.nomination_end)}.`
                 }
                 description={
                   windowClosed
@@ -561,7 +572,7 @@ function NominationFields({ draft, categories: activeList, cycles, employees, se
                   </div>
                   <div className="nf-profile-side">
                     {eligibility?.tier && <span className="nf-grant">Max grant · {formatTier(eligibility.tier)}</span>}
-                    <span className="nf-date">Date: {today}</span>
+                    <span className="nf-date">Date: {formatDate(today)}</span>
                   </div>
                 </div>
               )}

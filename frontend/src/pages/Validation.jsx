@@ -1,10 +1,13 @@
 import { useState } from 'react'
-import { Alert, Button, Segmented, Table, Tag } from 'antd'
+import { Alert, Button, Flex, Input, Segmented, Select, Table, Tag } from 'antd'
+import { SearchOutlined } from '@ant-design/icons'
 import PageHeader from '../components/PageHeader'
 import ValidationDrawer from '../components/ValidationDrawer'
 import { useApi } from '../hooks/useApi'
 import { listNominations } from '../services/api'
+import { formatShortDate } from '../utils/format'
 import { getStatus } from '../utils/nominations'
+import { useTableScroll } from '../hooks/useTableScroll'
 
 const views = [
   { value: 'submitted', label: 'To review' },
@@ -15,21 +18,39 @@ const views = [
 const keepOnOneLine = () => ({ style: { whiteSpace: 'nowrap' } })
 
 export default function Validation() {
+  const tableScroll = useTableScroll()
   const [view, setView] = useState('submitted')
   const [selectedId, setSelectedId] = useState(null)
+  const [search, setSearch] = useState('')
+  const [award, setAward] = useState()
   const { data: nominations, error, loading, reload } = useApi(listNominations)
 
-  const rows = (nominations ?? []).filter((nomination) => nomination.status === view)
+  // Search and the award filter apply first, so each tab's count matches what it would show.
+  const query = search.trim().toLowerCase()
+  const filtered = (nominations ?? []).filter(
+    (nomination) =>
+      (!award || nomination.award_name === award) &&
+      (!query ||
+        [nomination.nominee_name, nomination.nominator_display_name, nomination.award_name, String(nomination.id)].some(
+          (value) => value?.toLowerCase().includes(query),
+        )),
+  )
+  const countFor = (status) => filtered.filter((nomination) => nomination.status === status).length
+  const rows = filtered.filter((nomination) => nomination.status === view)
+  const awardOptions = [...new Set((nominations ?? []).map((nomination) => nomination.award_name).filter(Boolean))]
+    .sort()
+    .map((name) => ({ value: name, label: name }))
 
   const columns = [
     { title: 'No.', dataIndex: 'id' },
-    { title: 'Cycle', dataIndex: 'cycle_name', onCell: keepOnOneLine, responsive: ['md'] },
+    { title: 'Cycle', dataIndex: 'cycle_name', onCell: keepOnOneLine, responsive: ['lg'] },
     { title: 'Award', dataIndex: 'award_name' },
     { title: 'Nominee', dataIndex: 'nominee_name' },
-    { title: 'Nominator', dataIndex: 'nominator_display_name', responsive: ['md'] },
+    { title: 'Nominator', dataIndex: 'nominator_display_name', responsive: ['lg'] },
     {
       title: 'Status',
       dataIndex: 'status',
+      responsive: ['sm'],
       render: (value) => {
         const { color, label } = getStatus(value)
         return <Tag color={color}>{label}</Tag>
@@ -37,10 +58,10 @@ export default function Validation() {
     },
     {
       title: 'Submitted',
-      responsive: ['md'],
+      responsive: ['lg'],
       dataIndex: 'submitted_at',
       onCell: keepOnOneLine,
-      render: (submittedAt) => submittedAt?.slice(0, 10),
+      render: (submittedAt) => formatShortDate(submittedAt),
     },
     {
       title: 'Actions',
@@ -62,15 +83,41 @@ export default function Validation() {
 
       {error && <Alert type="error" title={error.message} style={{ marginBottom: 16 }} />}
 
-      <Segmented
-        aria-label="Filter by review status"
-        options={views}
-        value={view}
-        onChange={setView}
-        style={{ marginBottom: 16 }}
-      />
+      <Flex gap={8} wrap="wrap" align="center" style={{ marginBottom: 16 }}>
+        <Segmented
+          aria-label="Filter by review status"
+          options={views.map(({ value, label }) => ({ value, label: `${label} (${countFor(value)})` }))}
+          value={view}
+          onChange={setView}
+        />
+        <Input
+          allowClear
+          prefix={<SearchOutlined />}
+          placeholder="Search nominee, nominator, award or no."
+          aria-label="Search nominations"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          style={{ width: 300, maxWidth: '100%' }}
+        />
+        <Select
+          allowClear
+          aria-label="Filter by award"
+          placeholder="All awards"
+          value={award}
+          onChange={setAward}
+          options={awardOptions}
+          style={{ width: 220, maxWidth: '100%' }}
+        />
+      </Flex>
 
-      <Table rowKey="id" columns={columns} dataSource={rows} loading={loading} scroll={{ x: 'max-content' }} />
+      <Table
+        rowKey="id"
+        columns={columns}
+        dataSource={rows}
+        loading={loading}
+        scroll={tableScroll}
+        locale={{ emptyText: view === 'submitted' && !query && !award ? 'Nothing waiting for review.' : 'No nominations match.' }}
+      />
 
       <ValidationDrawer
         nominationId={selectedId}

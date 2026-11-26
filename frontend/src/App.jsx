@@ -46,6 +46,13 @@ export default function App() {
           colorPrimary: '#1677ff',
           borderRadius: 6,
           fontFamily: "'DM Sans', sans-serif",
+          // Easier reading for every age: one step up from antd's 14px, darker hint text
+          // (antd's 0.45 grey is below the 4.5:1 contrast minimum), and small buttons a bit taller.
+          fontSize: 15,
+          colorTextTertiary: 'rgba(0, 0, 0, 0.6)',
+          colorTextDescription: 'rgba(0, 0, 0, 0.6)',
+          colorTextPlaceholder: 'rgba(0, 0, 0, 0.45)',
+          controlHeightSM: 28,
         },
       }}
     >

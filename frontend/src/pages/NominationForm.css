@@ -46,8 +46,8 @@
 
 .nf-section-head p {
   margin: 2px 0 0;
-  color: #9ca3af;
-  font-size: 12px;
+  color: #6b7280;
+  font-size: 13px;
 }
 
 .nf-section-number,
@@ -97,7 +97,7 @@
   flex-direction: column;
   min-width: 180px;
   color: #6b7280;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .nf-profile-text strong {
@@ -117,13 +117,13 @@
   border-radius: 999px;
   background: #1677ff;
   color: #fff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .nf-date {
-  color: #9ca3af;
-  font-size: 11px;
+  color: #6b7280;
+  font-size: 12px;
 }
 
 /* ---- Criteria ---- */
@@ -145,7 +145,7 @@
   width: 24px;
   height: 24px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 /* ---- Summary rail ---- */
@@ -179,7 +179,7 @@
   border-radius: 999px;
   background: #e6f4ff;
   color: #1677ff;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .nf-summary .ant-progress {
@@ -195,7 +195,7 @@
 }
 
 .nf-summary-facts dt {
-  color: #9ca3af;
+  color: #6b7280;
 }
 
 .nf-summary-facts dd {
@@ -312,12 +312,12 @@
     background: rgba(255, 255, 255, 0.96);
     box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.06);
     color: #6b7280;
-    font-size: 12px;
+    font-size: 13px;
   }
 }
 
 .nf-hint {
   display: block;
   margin-top: -8px;
-  font-size: 12px;
+  font-size: 13px;
 }

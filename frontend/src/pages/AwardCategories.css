@@ -13,8 +13,8 @@
 
 .award-toolbar-count {
   margin-left: auto;
-  color: #9ca3af;
-  font-size: 12px;
+  color: #6b7280;
+  font-size: 13px;
 }
 
 .award-grid {
@@ -85,7 +85,7 @@
   background: #f3f4f6;
   color: #6b7280;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 11px;
+  font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -137,8 +137,8 @@
 
 .award-card-label {
   margin-bottom: 8px;
-  color: #9ca3af;
-  font-size: 11px;
+  color: #6b7280;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -156,7 +156,7 @@
   border-radius: 6px;
   background: #f5faff;
   color: #4b5563;
-  font-size: 12px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -165,7 +165,7 @@
 }
 
 .award-card-muted {
-  color: #9ca3af;
+  color: #6b7280;
   font-size: 13px;
 }
 
@@ -254,7 +254,7 @@
   border: 0;
   border-radius: 6px;
   background: none;
-  color: #9ca3af;
+  color: #6b7280;
   cursor: grab;
 }
 

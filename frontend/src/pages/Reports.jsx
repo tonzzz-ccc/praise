@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { Alert, Button, Card, Empty, Flex, Table, Tooltip, Typography, theme } from 'antd'
+import { Alert, Button, Card, Empty, Flex, Grid, Table, Tooltip, Typography, theme } from 'antd'
 import { DownloadOutlined, ExclamationCircleFilled, PrinterOutlined } from '@ant-design/icons'
 import { CycleSelect } from '../components/AwardingShared'
 import PageHeader from '../components/PageHeader'
@@ -107,21 +107,25 @@ function BudgetMeter({ budget }) {
   )
 }
 
+// showFrom: the smallest screen (antd breakpoint) that shows the column. The totals row is built
+// from the same visible columns, so it always lines up.
 const awardColumns = [
   { title: 'Award', dataIndex: 'award_name' },
   { title: 'Nominations', dataIndex: 'submitted', align: 'right', render: count },
-  { title: 'Disqualified', dataIndex: 'disqualified', align: 'right', render: count },
-  { title: 'Passed validation', dataIndex: 'validated', align: 'right', render: count },
-  { title: 'Shortlisted', dataIndex: 'shortlisted', align: 'right', render: count },
+  { title: 'Disqualified', dataIndex: 'disqualified', align: 'right', render: count, showFrom: 'md' },
+  { title: 'Passed validation', dataIndex: 'validated', align: 'right', render: count, showFrom: 'md' },
+  { title: 'Shortlisted', dataIndex: 'shortlisted', align: 'right', render: count, showFrom: 'md' },
   { title: 'Awarded', dataIndex: 'awarded', align: 'right', render: count },
   {
     title: 'Awardees',
     dataIndex: 'awardees',
+    showFrom: 'lg',
     render: (names) => (names.length ? names.join(', ') : <Text type="secondary">—</Text>),
   },
-  { title: 'Grants released', dataIndex: 'grants_released', align: 'right', render: (amount) => formatMoney(amount) },
-  { title: 'Not yet released', dataIndex: 'grants_pending', align: 'right', render: (amount) => formatMoney(amount) },
+  { title: 'Grants released', dataIndex: 'grants_released', align: 'right', render: (amount) => formatMoney(amount), showFrom: 'sm' },
+  { title: 'Not yet released', dataIndex: 'grants_pending', align: 'right', render: (amount) => formatMoney(amount), showFrom: 'md' },
 ]
+const MONEY_TOTALS = ['grants_released', 'grants_pending']
 
 const awardeeColumns = [
   { title: 'Award', dataIndex: 'award_name' },
@@ -129,10 +133,11 @@ const awardeeColumns = [
   {
     title: 'Unit',
     key: 'unit',
+    responsive: ['md'],
     render: (_, awardee) => (awardee.nominee_type === 'section' ? 'Section or unit' : (awardee.unit_name ?? '—')),
   },
-  { title: 'Conferred', dataIndex: 'conferment_date', render: (date) => formatDate(date) },
-  { title: 'Plaque or certificate', key: 'plaque', render: (_, awardee) => itemState(awardee, (date) => `released ${formatDate(date)}`) },
+  { title: 'Conferred', dataIndex: 'conferment_date', responsive: ['lg'], render: (date) => formatDate(date) },
+  { title: 'Plaque or certificate', key: 'plaque', responsive: ['md'], render: (_, awardee) => itemState(awardee, (date) => `released ${formatDate(date)}`) },
   {
     title: 'Grant',
     key: 'grant',
@@ -271,21 +276,27 @@ export default function Reports() {
   const load = useCallback(() => (cycleId ? getReport(cycleId) : Promise.resolve(null)), [cycleId])
   const { data: report, error, loading } = useApi(load)
 
+  const screens = Grid.useBreakpoint()
+  const visibleAwardColumns = awardColumns.filter((column) => !column.showFrom || screens[column.showFrom])
+
   const totalsRow = report && (
     <Table.Summary.Row className="report-total-row">
-      <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
-      {['submitted', 'disqualified', 'validated', 'shortlisted', 'awarded'].map((key, index) => (
-        <Table.Summary.Cell key={key} index={index + 1} align="right">
-          {report.totals[key]}
-        </Table.Summary.Cell>
-      ))}
-      <Table.Summary.Cell index={6} />
-      <Table.Summary.Cell index={7} align="right">
-        {formatMoney(report.totals.grants_released)}
-      </Table.Summary.Cell>
-      <Table.Summary.Cell index={8} align="right">
-        {formatMoney(report.totals.grants_pending)}
-      </Table.Summary.Cell>
+      {visibleAwardColumns.map((column, index) => {
+        const key = column.dataIndex
+        const value =
+          key === 'award_name'
+            ? 'Total'
+            : key in report.totals
+              ? MONEY_TOTALS.includes(key)
+                ? formatMoney(report.totals[key])
+                : report.totals[key]
+              : null
+        return (
+          <Table.Summary.Cell key={key} index={index} align={column.align}>
+            {value}
+          </Table.Summary.Cell>
+        )
+      })}
     </Table.Summary.Row>
   )
 
@@ -349,10 +360,10 @@ export default function Reports() {
             <Table
               rowKey="key"
               size="small"
-              columns={awardColumns}
+              columns={visibleAwardColumns}
               dataSource={report.awards}
               pagination={false}
-              scroll={{ x: 1100 }}
+              scroll={screens.md ? { x: 1100 } : undefined}
               summary={() => <Table.Summary>{totalsRow}</Table.Summary>}
             />
           </Card>
@@ -364,7 +375,7 @@ export default function Reports() {
               columns={awardeeColumns}
               dataSource={report.awardees}
               pagination={false}
-              scroll={{ x: 900 }}
+              scroll={screens.md ? { x: 900 } : undefined}
               locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No awardees in this cycle yet." /> }}
             />
           </Card>

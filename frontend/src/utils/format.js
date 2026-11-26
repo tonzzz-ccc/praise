@@ -47,3 +47,18 @@ export function formatRelativeTime(value) {
   const [unit, size] = RELATIVE_STEPS.find(([, step]) => Math.abs(seconds) >= step) ?? RELATIVE_STEPS.at(-1)
   return relativeFormatter.format(Math.round(seconds / size), unit)
 }
+
+// Dates from the API come as "YYYY-MM-DD" or "YYYY-MM-DD hh:mm:ss"; only the day is shown.
+const longDateFormatter = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+const shortDateFormatter = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+const toLocalDay = (value) => new Date(`${String(value).slice(0, 10)}T00:00:00`)
+
+// "November 19, 2026", for sentences and detail views. Empty values show as a dash.
+export function formatDate(value) {
+  return value ? longDateFormatter.format(toLocalDay(value)) : '—'
+}
+
+// "Nov 19, 2026", for tables and cards.
+export function formatShortDate(value) {
+  return value ? shortDateFormatter.format(toLocalDay(value)) : '—'
+}

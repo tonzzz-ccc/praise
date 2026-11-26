@@ -30,6 +30,7 @@ import {
   ratingPercent,
 } from '../utils/nominations'
 import './Screening.css'
+import { useTableScroll } from '../hooks/useTableScroll'
 
 const criteria = Object.keys(criterionShortLabels)
 const roleNames = { chair: 'Chairperson', secretariat: 'Secretariat', member: 'Member' }
@@ -208,13 +209,14 @@ function MemberScores({ nomination }) {
           render: (_, row) => `${row.scores[key]} · ${formatPercent(ratingPercent(row.scores[key], nomination.weights[key]))}`,
         })),
         { title: 'Total', dataIndex: 'total', render: (value) => formatPercent(value) },
-        { title: 'Remarks', dataIndex: 'remarks', render: (value) => value || '—' },
+        { title: 'Remarks', dataIndex: 'remarks', responsive: ['md'], render: (value) => value || '—' },
       ]}
     />
   )
 }
 
 export default function Screening() {
+  const tableScroll = useTableScroll()
   const { can } = useAccess()
   const canSeeResults = can('screening.results')
   const [chosenCycleId, setChosenCycleId] = useState()
@@ -239,7 +241,7 @@ export default function Screening() {
 
   const columns = [
     { title: 'Nominee', dataIndex: 'nominee_name' },
-    { title: 'Status', dataIndex: 'status', render: (status) => <StatusTag status={status} /> },
+    { title: 'Status', dataIndex: 'status', responsive: ['sm'], render: (status) => <StatusTag status={status} /> },
     {
       title: 'My score',
       key: 'mine',
@@ -253,10 +255,11 @@ export default function Screening() {
           {
             title: 'Scored by',
             key: 'count',
+            responsive: ['md'],
             render: (_, row) => `${row.scores.length} of ${data.active_members}`,
           },
           { title: 'Average', dataIndex: 'average', render: (value) => (value === null ? '—' : formatPercent(value)) },
-          { title: 'Rank', dataIndex: 'rank', render: (value) => value ?? '—' },
+          { title: 'Rank', dataIndex: 'rank', responsive: ['sm'], render: (value) => value ?? '—' },
         ]
       : []),
     {
@@ -311,17 +314,27 @@ export default function Screening() {
           {groups.map((group) => {
             const weights = group.rows[0].weights
             const open = group.rows.some((row) => row.status === 'validated')
+            // The member's own progress; their own nominations are not theirs to rate.
+            const rateable = group.rows.filter((row) => !row.is_own_nomination)
+            const rated = rateable.filter((row) => row.my_total !== null).length
+            const showProgress = isMember && open && rateable.length > 0
             return (
               <Card
                 key={group.key}
                 title={group.awardName}
                 extra={
-                  canSeeResults &&
-                  open && (
-                    <Button type="primary" size="small" onClick={() => setFinalizing(group)}>
-                      Finalize
-                    </Button>
-                  )
+                  <Flex gap={8} align="center">
+                    {showProgress && (
+                      <Tag color={rated === rateable.length ? 'success' : 'warning'} style={{ margin: 0 }}>
+                        You rated {rated} of {rateable.length}
+                      </Tag>
+                    )}
+                    {canSeeResults && open && (
+                      <Button type="primary" size="small" onClick={() => setFinalizing(group)}>
+                        Finalize
+                      </Button>
+                    )}
+                  </Flex>
                 }
               >
                 <Flex gap={8} wrap="wrap" style={{ marginBottom: 12 }}>
@@ -337,7 +350,7 @@ export default function Screening() {
                   pagination={false}
                   columns={columns}
                   dataSource={group.rows}
-                  scroll={{ x: 'max-content' }}
+                  scroll={tableScroll}
                   expandable={canSeeResults ? { expandedRowRender: (row) => <MemberScores nomination={row} /> } : undefined}
                 />
               </Card>

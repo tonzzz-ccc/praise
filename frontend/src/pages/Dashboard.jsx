@@ -12,14 +12,13 @@ import PageHeader from '../components/PageHeader'
 import { useAccess } from '../hooks/useAccess'
 import { useApi } from '../hooks/useApi'
 import { getNomineesPerCategory, listCycles, listMyNominations } from '../services/api'
+import { formatDate, formatShortDate } from '../utils/format'
 import './Dashboard.css'
 
 const DAY = 24 * 60 * 60 * 1000
 
 const toDate = (value) => new Date(`${value.slice(0, 10)}T00:00:00`)
 const todayString = () => new Date().toLocaleDateString('en-CA')
-const formatDate = (value) => toDate(value).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-const formatShortDate = (value) => toDate(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 const plural = (count, one, many = `${one}s`) => `${count} ${count === 1 ? one : many}`
 
 // Where today falls in the nomination window, counted in whole days and including both end dates.
@@ -63,7 +62,19 @@ function NominationHero({ cycles, error }) {
   if (!cycle) {
     return (
       <div className="dashboard-card dashboard-section">
-        <Empty description="No award cycle is open. Set one up in Settings." />
+        <Empty
+          description={
+            can('settings')
+              ? 'No award cycle is open. Set one up in System Settings > General.'
+              : 'Nominations are not open yet. You will be able to nominate once the Secretariat opens the next cycle.'
+          }
+        >
+          {can('settings') && (
+            <Link to="/settings">
+              <Button type="primary">Go to Settings</Button>
+            </Link>
+          )}
+        </Empty>
       </div>
     )
   }

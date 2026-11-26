@@ -4,6 +4,8 @@ import { PlusOutlined } from '@ant-design/icons'
 import PageHeader from '../components/PageHeader'
 import { useAccess } from '../hooks/useAccess'
 import { useApi } from '../hooks/useApi'
+import { useTableScroll } from '../hooks/useTableScroll'
+import { formatShortDate } from '../utils/format'
 import {
   addCommitteeMember,
   listCommittee,
@@ -115,6 +117,7 @@ function RelieveModal({ member, onCancel, onRelieved }) {
 }
 
 export default function Committee() {
+  const tableScroll = useTableScroll()
   const { can } = useAccess()
   const canManage = can('committee.manage')
   const [chosenCycleId, setChosenCycleId] = useState()
@@ -139,7 +142,7 @@ export default function Committee() {
 
   const columns = [
     { title: 'Name', dataIndex: 'name' },
-    { title: 'Role', dataIndex: 'role', render: roleLabel },
+    { title: 'Role', dataIndex: 'role', responsive: ['sm'], render: roleLabel },
     {
       title: 'Status',
       key: 'status',
@@ -150,7 +153,7 @@ export default function Committee() {
       title: 'Relieved',
       responsive: ['md'],
       key: 'relieved',
-      render: (_, member) => member.relieved_at && `${member.relieved_at.slice(0, 10)}: ${member.relieved_reason}`,
+      render: (_, member) => member.relieved_at && `${formatShortDate(member.relieved_at)}: ${member.relieved_reason}`,
     },
     ...(canManage
       ? [
@@ -210,7 +213,7 @@ export default function Committee() {
         />
       </Flex>
 
-      <Table rowKey="id" columns={columns} dataSource={members ?? []} loading={loading} scroll={{ x: 'max-content' }} />
+      <Table rowKey="id" columns={columns} dataSource={members ?? []} loading={loading} scroll={tableScroll} />
 
       {canManage && (
         <>

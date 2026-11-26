@@ -8,6 +8,7 @@ import PageHeader from '../components/PageHeader'
 import { useAccess } from '../hooks/useAccess'
 import { useApi } from '../hooks/useApi'
 import { getCohApproval, listCohChoiceCandidates, saveCohChoice, selectAwardWinner } from '../services/api'
+import { useTableScroll } from '../hooks/useTableScroll'
 
 const choiceTypes = {
   section: { title: 'COH Choice - Section', field: 'section_id', placeholder: 'Choose a section' },
@@ -75,6 +76,7 @@ function ChoiceCard({ type, choice, candidates, canDecide, onChoose }) {
 }
 
 export default function CohApproval() {
+  const tableScroll = useTableScroll()
   const { can } = useAccess()
   const canDecide = can('coh_approval.decide')
   const [modal, modalHolder] = Modal.useModal()
@@ -130,8 +132,8 @@ export default function CohApproval() {
     return [
       { title: 'Nominee', dataIndex: 'nominee_name' },
       ...(hasLevels(award.nominations) ? [{ title: 'Level', dataIndex: 'tier_label' }] : []),
-      { title: 'Screening average', dataIndex: 'average', render: formatAverage },
-      { title: 'Status', dataIndex: 'status', render: (status) => <StatusTag status={status} /> },
+      { title: 'Screening average', dataIndex: 'average', responsive: ['sm'], render: formatAverage },
+      { title: 'Status', dataIndex: 'status', responsive: ['md'], render: (status) => <StatusTag status={status} /> },
       {
         title: 'Actions',
         key: 'actions',
@@ -181,7 +183,7 @@ export default function CohApproval() {
             pagination={false}
             columns={columnsFor(award)}
             dataSource={award.nominations}
-            scroll={{ x: 'max-content' }}
+            scroll={tableScroll}
           />
         </Card>
       ),

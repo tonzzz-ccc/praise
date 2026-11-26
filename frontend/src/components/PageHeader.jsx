@@ -10,7 +10,7 @@ export default function PageHeader({ title, subtitle, extra }) {
           {title}
         </Typography.Title>
         {subtitle && (
-          <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+          <Typography.Text type="secondary" style={{ fontSize: 14 }}>
             {subtitle}
           </Typography.Text>
         )}

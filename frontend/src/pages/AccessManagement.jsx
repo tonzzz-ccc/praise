@@ -18,6 +18,7 @@ import { useAccess } from '../hooks/useAccess'
 import { useApi } from '../hooks/useApi'
 import { listAllEmployees, saveRolePermissions, saveUserAccess } from '../services/api'
 import { findUserRole, isAllowedForRole, lockedRolesLabel, userPermissions } from '../utils/access'
+import { useTableScroll } from '../hooks/useTableScroll'
 import './AccessManagement.css'
 
 const PAGE_SIZES = [10, 25, 50]
@@ -446,6 +447,7 @@ function Pagination({ page, totalPages, onChange }) {
 }
 
 export default function AccessManagement() {
+  const tableScroll = useTableScroll()
   const { access, reload } = useAccess()
   const { data: employees, error, loading } = useApi(listAllEmployees)
   const [search, setSearch] = useState('')
@@ -648,7 +650,7 @@ export default function AccessManagement() {
           dataSource={rows}
           loading={loading}
           pagination={false}
-          scroll={{ x: 'max-content' }}
+          scroll={tableScroll}
           locale={{ emptyText: <div className="am-empty">No users found</div> }}
         />
       )}

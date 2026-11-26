@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
-import { Alert, Avatar, Button, Empty, Input, message, Popconfirm, Segmented, Select, Skeleton, Tag, Tooltip } from 'antd'
-import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons'
+import { Alert, Avatar, Button, Empty, Grid, Input, message, Popconfirm, Segmented, Select, Skeleton, Tag, Tooltip } from 'antd'
+import { DeleteOutlined, EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined, TeamOutlined, TrophyOutlined, UserOutlined } from '@ant-design/icons'
 import { Link, useLocation } from 'react-router-dom'
 import NominationDetails from '../components/NominationDetails'
 import PageHeader from '../components/PageHeader'
 import { useAccess } from '../hooks/useAccess'
 import { useApi } from '../hooks/useApi'
 import { deleteDraft, listCategories, listCycles, listMyNominations } from '../services/api'
+import { formatShortDate } from '../utils/format'
 import { getStatus, nominationCriteria } from '../utils/nominations'
+import './AwardCategories.css'
 import './Nominations.css'
 
 // Status tabs, each with a count. "Other" statuses (shortlisted, awarded, …) only show under All.
@@ -19,8 +21,6 @@ const statusTabs = [
   { value: 'disqualified', label: 'Disqualified' },
 ]
 
-const formatDate = (value) =>
-  new Date(`${value.slice(0, 10)}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 
 const initials = (name) =>
   (name ?? '?')
@@ -32,6 +32,8 @@ const initials = (name) =>
     .join('')
     .toUpperCase()
 
+// Same card as Award Categories: chip, number badge and status on top, the award as the title,
+// the nominee below it, tags, a divided bottom section and the actions in the footer.
 function NominationCard({ nomination, canContinue, onView, onDelete }) {
   const status = getStatus(nomination.status) ?? { label: nomination.status, color: 'default' }
   const isDraft = nomination.status === 'draft'
@@ -40,52 +42,65 @@ function NominationCard({ nomination, canContinue, onView, onDelete }) {
   const total = nominationCriteria.length
 
   return (
-    <article className="nomination-card">
-      <span className="nomination-card-chip" aria-hidden>
-        {(nomination.award_name ?? '?').charAt(0)}
-      </span>
+    <article className="award-card">
+      <div className="award-card-top">
+        <span className="award-card-chip" aria-hidden>
+          <TrophyOutlined />
+        </span>
+        <span className="award-card-code">No. {nomination.id}</span>
+        <span className="award-card-switch">
+          <Tag color={status.color} className="nomination-card-status">
+            {status.label}
+          </Tag>
+        </span>
+      </div>
 
-      <div className="nomination-card-main">
-        <div className="nomination-card-title">
-          <span>{nomination.award_name}</span>
-          <span className="nomination-card-no">No. {nomination.id}</span>
-        </div>
-        <div className="nomination-card-nominee">
-          <Avatar size={22} icon={isSection ? <TeamOutlined /> : undefined} className="nomination-card-avatar">
-            {isSection ? null : initials(nomination.nominee_name)}
-          </Avatar>
-          <span>{nomination.nominee_name ?? 'No nominee yet'}</span>
-        </div>
-        <div className="nomination-card-meta">
-          {nomination.cycle_name}
-          {nomination.nominator_display_name && <> · Nominated by {nomination.nominator_display_name}</>}
-        </div>
-        {isDraft && (
-          <Tooltip title="Each criterion needs at least one supporting document before submitting.">
-            <div className="nomination-card-progress">
-              <div className="nomination-card-progress-track">
-                <div style={{ width: `${(documented / total) * 100}%` }} />
+      <h3 className="award-card-title">{nomination.award_name}</h3>
+      <div className="nomination-card-nominee">
+        <Avatar size={22} icon={isSection ? <TeamOutlined /> : undefined} className="nomination-card-avatar">
+          {isSection ? null : initials(nomination.nominee_name)}
+        </Avatar>
+        <span className="nomination-card-nominee-name">{nomination.nominee_name ?? 'No nominee yet'}</span>
+      </div>
+
+      <div className="award-card-tags">
+        <Tag icon={isSection ? <TeamOutlined /> : <UserOutlined />}>{isSection ? 'Section/Committee' : 'Individual'}</Tag>
+        {nomination.cycle_name && <Tag color="blue">{nomination.cycle_name}</Tag>}
+      </div>
+
+      <div className="award-card-grant">
+        {isDraft ? (
+          <>
+            <div className="award-card-label">Criteria documented</div>
+            <Tooltip title="Each criterion needs at least one supporting document before submitting.">
+              <div className="nomination-card-progress">
+                <div className="nomination-card-progress-track">
+                  <div style={{ width: `${(documented / total) * 100}%` }} />
+                </div>
+                <span>
+                  {documented} of {total}
+                </span>
               </div>
-              <span>
-                {documented} of {total} criteria documented
-              </span>
-            </div>
-          </Tooltip>
+            </Tooltip>
+            <div className="nomination-card-meta">Saved {formatShortDate(nomination.updated_at)}</div>
+          </>
+        ) : (
+          <>
+            <div className="award-card-label">Submitted</div>
+            <div className="nomination-card-date">{formatShortDate(nomination.submitted_at)}</div>
+            {nomination.nominator_display_name && (
+              <div className="nomination-card-meta">Nominated by {nomination.nominator_display_name}</div>
+            )}
+          </>
         )}
       </div>
 
-      <div className="nomination-card-side">
-        <Tag color={status.color} className="nomination-card-status">
-          {status.label}
-        </Tag>
-        <span className="nomination-card-date">
-          {nomination.submitted_at ? `Submitted ${formatDate(nomination.submitted_at)}` : `Saved ${formatDate(nomination.updated_at)}`}
-        </span>
-        <div className="nomination-card-actions">
-          <Button size="small" icon={<EyeOutlined />} onClick={() => onView(nomination.id)}>
-            View
-          </Button>
-          {isDraft && canContinue && (
+      <div className="award-card-footer">
+        <Button type="link" size="small" icon={<EyeOutlined />} onClick={() => onView(nomination.id)} style={{ paddingInline: 0 }}>
+          View details
+        </Button>
+        {isDraft && canContinue && (
+          <span className="nomination-card-actions">
             <Popconfirm
               title="Delete this draft?"
               description="The draft and its attached files are removed for good."
@@ -93,19 +108,17 @@ function NominationCard({ nomination, canContinue, onView, onDelete }) {
               okButtonProps={{ danger: true }}
               onConfirm={() => onDelete(nomination)}
             >
-              <Button size="small" danger icon={<DeleteOutlined />}>
+              <Button size="small" danger icon={<DeleteOutlined />} aria-label={`Delete draft No. ${nomination.id}`}>
                 Delete
               </Button>
             </Popconfirm>
-          )}
-          {isDraft && canContinue && (
             <Link to={`/nominations/${nomination.id}/edit`}>
               <Button size="small" type="primary" icon={<EditOutlined />}>
                 Continue
               </Button>
             </Link>
-          )}
-        </div>
+          </span>
+        )}
       </div>
     </article>
   )
@@ -121,6 +134,7 @@ export default function Nominations() {
 
   const [messageApi, messageHolder] = message.useMessage()
   const location = useLocation()
+  const screens = Grid.useBreakpoint()
 
   // A draft deleted from its edit page comes back here to confirm it. The state is then cleared
   // without a re-render, so a page refresh does not show the message again.
@@ -179,54 +193,69 @@ export default function Nominations() {
 
       {error && <Alert type="error" title={error.message} style={{ marginBottom: 16 }} />}
 
-      <div className="nominations-toolbar">
-        <div className="nominations-tabs">
-          <Segmented
+      <div className="award-toolbar">
+        <Input
+          allowClear
+          prefix={<SearchOutlined />}
+          placeholder="Search award, nominee or no."
+          aria-label="Search nominations"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          className="award-toolbar-search"
+        />
+        {/* Phones get a dropdown, since five tabs do not fit across. */}
+        {screens.sm === false ? (
+          <Select
+            aria-label="Filter by status"
             value={tab}
             onChange={setTab}
-            options={statusTabs.map(({ value, label }) => ({
-              value,
-              label: (
-                <span className="nominations-tab">
-                  {label} <span className="nominations-tab-count">{countFor(value)}</span>
-                </span>
-              ),
-            }))}
+            options={statusTabs.map(({ value, label }) => ({ value, label: `${label} (${countFor(value)})` }))}
+            className="nominations-filter"
           />
-        </div>
-        <div className="nominations-filters page-filters">
-          <Input
-            allowClear
-            prefix={<SearchOutlined />}
-            placeholder="Search award, nominee or no."
-            aria-label="Search nominations"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
-          <Select
-            allowClear
-            aria-label="Filter by cycle"
-            placeholder="All cycles"
-            value={cycleId}
-            onChange={setCycleId}
-            options={(cycles ?? []).map((cycle) => ({ value: cycle.id, label: cycle.name }))}
-          />
-          <Select
-            allowClear
-            aria-label="Filter by award"
-            placeholder="All awards"
-            value={categoryId}
-            onChange={setCategoryId}
-            options={(categories ?? []).map((category) => ({ value: category.id, label: category.name }))}
-          />
-        </div>
+        ) : (
+          <div className="nominations-tabs">
+            <Segmented
+              value={tab}
+              onChange={setTab}
+              options={statusTabs.map(({ value, label }) => ({
+                value,
+                label: (
+                  <span className="nominations-tab">
+                    {label} <span className="nominations-tab-count">{countFor(value)}</span>
+                  </span>
+                ),
+              }))}
+            />
+          </div>
+        )}
+        <Select
+          allowClear
+          aria-label="Filter by cycle"
+          placeholder="All cycles"
+          value={cycleId}
+          onChange={setCycleId}
+          options={(cycles ?? []).map((cycle) => ({ value: cycle.id, label: cycle.name }))}
+          className="nominations-filter"
+        />
+        <Select
+          allowClear
+          aria-label="Filter by award"
+          placeholder="All awards"
+          value={categoryId}
+          onChange={setCategoryId}
+          options={(categories ?? []).map((category) => ({ value: category.id, label: category.name }))}
+          className="nominations-filter"
+        />
+        <span className="award-toolbar-count">
+          {rows.length} of {(nominations ?? []).length} nominations
+        </span>
       </div>
 
       {!nominations && loading ? (
-        <div className="nominations-list">
+        <div className="award-grid">
           {[0, 1, 2].map((key) => (
-            <div key={key} className="nomination-card">
-              <Skeleton active avatar paragraph={{ rows: 1 }} />
+            <div key={key} className="award-card">
+              <Skeleton active />
             </div>
           ))}
         </div>
@@ -246,7 +275,7 @@ export default function Nominations() {
           </Empty>
         </div>
       ) : (
-        <div className="nominations-list">
+        <div className="award-grid">
           {rows.map((nomination) => (
             <NominationCard key={nomination.id} nomination={nomination} canContinue={canCreate} onView={setSelectedId} onDelete={removeDraft} />
           ))}

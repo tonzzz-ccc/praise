@@ -122,8 +122,8 @@ body {
 }
 
 .praise-sider-brand-tagline {
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 10px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -138,7 +138,7 @@ body {
 }
 
 .praise-sider .ant-menu .ant-menu-item-group-title {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -191,9 +191,9 @@ body {
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.62);
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -249,8 +249,31 @@ body {
 }
 
 .praise-header-breadcrumb {
+  min-width: 0;
+  overflow: hidden;
   font-size: 14px;
   white-space: nowrap;
+}
+
+/* The breadcrumb shrinks (with …) so the account menu on the right is never pushed off screen. */
+.praise-header-left {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.praise-header-right {
+  flex-shrink: 0;
+}
+
+.praise-header-breadcrumb ol {
+  flex-wrap: nowrap;
+}
+
+.praise-header-breadcrumb li:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .praise-header-breadcrumb li:last-child {
@@ -267,7 +290,7 @@ body {
   border-radius: 999px;
   background: #ecfdf5;
   color: #065f46;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -335,12 +358,12 @@ body {
 
 .praise-header-account-role {
   color: #6b7280;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .praise-header-account-caret {
-  color: #9ca3af;
-  font-size: 10px;
+  color: #6b7280;
+  font-size: 12px;
 }
 
 /* ---- Responsive page basics ---- */
@@ -359,6 +382,25 @@ body {
   /* Filter rows: each dropdown takes the full width. */
   .page-filters > .ant-select {
     width: 100% !important;
+  }
+
+  /* Cards inside pages: less padding, and titles wrap instead of being cut off. */
+  .ant-card .ant-card-body {
+    padding: 16px;
+  }
+
+  .ant-card .ant-card-head {
+    padding: 0 16px;
+  }
+
+  .ant-card .ant-card-head-title {
+    white-space: normal;
+  }
+
+  .ant-card .ant-card-head-wrapper {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 0;
   }
 
   /* Tables: tighter cells so more fits before scrolling sideways. */
@@ -410,4 +452,15 @@ body {
 /* Clear spacing so the helper text never touches the dropzone border. */
 .nomination-docs-item .ant-form-item-extra {
   margin-top: 6px;
+}
+
+/* Shown only on phones, where the table column holding the same value is hidden. */
+.records-award-xs {
+  display: none;
+}
+
+@media (max-width: 575px) {
+  .records-award-xs {
+    display: block;
+  }
 }

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { Alert, Button, DatePicker, Empty, Flex, Form, Input, InputNumber, Modal, Segmented, Table, Tag, Tooltip, Typography } from 'antd'
+import { Alert, Button, DatePicker, Empty, Flex, Form, Grid, Input, InputNumber, Modal, Segmented, Table, Tag, Tooltip, Typography } from 'antd'
 import { CheckCircleFilled, ClockCircleOutlined, SearchOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { CycleSelect, StatusTag } from '../components/AwardingShared'
@@ -156,18 +156,23 @@ function ReleaseModal({ awardee, onCancel, onSaved }) {
 }
 
 function AwardeesTable({ awardees, canManage, onEdit }) {
+  const screens = Grid.useBreakpoint()
   const columns = [
-    { title: 'Award', dataIndex: 'award_name', width: 220 },
+    { title: 'Award', dataIndex: 'award_name', responsive: ['sm'] },
     {
       title: 'Awardee',
       key: 'awardee',
       render: (_, awardee) => (
         <Flex vertical>
           <Text strong>{awardee.awardee_name}</Text>
-          <Text type="secondary" style={{ fontSize: 12 }}>
+          <Text type="secondary" style={{ fontSize: 13 }}>
             {awardee.nominee_type === 'section'
               ? 'Section or unit'
               : [awardee.position_title, awardee.unit_name].filter(Boolean).join(' · ')}
+          </Text>
+          {/* The Award column is hidden on phones, so the award shows here instead. */}
+          <Text type="secondary" className="records-award-xs" style={{ fontSize: 13 }}>
+            {awardee.award_name}
           </Text>
         </Flex>
       ),
@@ -176,23 +181,25 @@ function AwardeesTable({ awardees, canManage, onEdit }) {
       title: 'Conferred',
       dataIndex: 'conferment_date',
       width: 150,
+      responsive: ['md'],
       render: (date) => (date ? formatDate(date) : <Text type="secondary">Not yet</Text>),
     },
     {
       title: 'Plaque or certificate',
       key: 'plaque',
       width: 190,
+      responsive: ['md'],
       render: (_, awardee) =>
         awardee.has_certificate ? (
           <ReleaseState applies date={awardee.certificate_released_on}>
-            <Text type="secondary" style={{ fontSize: 12 }}>
+            <Text type="secondary" style={{ fontSize: 13 }}>
               Certificate
             </Text>
           </ReleaseState>
         ) : (
           <ReleaseState applies={awardee.has_plaque} date={awardee.plaque_released_on}>
             {awardee.has_plaque && (
-              <Text type="secondary" style={{ fontSize: 12 }}>
+              <Text type="secondary" style={{ fontSize: 13 }}>
                 Plaque
               </Text>
             )}
@@ -203,9 +210,10 @@ function AwardeesTable({ awardees, canManage, onEdit }) {
       title: 'Cash grant',
       key: 'grant',
       width: 210,
+      responsive: ['md'],
       render: (_, awardee) => (
         <ReleaseState applies={awardee.has_grant} date={awardee.grant_released_on}>
-          <Text type="secondary" style={{ fontSize: 12 }}>
+          <Text type="secondary" style={{ fontSize: 13 }}>
             {awardee.grant_released_on
               ? formatMoney(awardee.grant_amount)
               : awardee.max_grant !== null
@@ -238,13 +246,15 @@ function AwardeesTable({ awardees, canManage, onEdit }) {
       columns={columns}
       dataSource={awardees}
       pagination={false}
-      scroll={{ x: 900 }}
+      // Phones show fewer columns that fit the screen; wider screens scroll sideways if needed.
+      scroll={screens.md ? { x: 900 } : undefined}
       locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No awardees in this cycle yet." /> }}
     />
   )
 }
 
 function NominationsTable({ nominations }) {
+  const screens = Grid.useBreakpoint()
   const [search, setSearch] = useState('')
   const awards = [...new Set(nominations.map((nomination) => nomination.award_name))]
   const statuses = nominationStatuses.filter((status) => nominations.some((nomination) => nomination.status === status.value))
@@ -264,7 +274,7 @@ function NominationsTable({ nominations }) {
       onFilter: (value, nomination) => nomination.award_name === value,
     },
     { title: 'Nominee', dataIndex: 'nominee_name' },
-    { title: 'Nominator', dataIndex: 'nominator_name', render: (name) => name ?? '—' },
+    { title: 'Nominator', dataIndex: 'nominator_name', responsive: ['lg'], render: (name) => name ?? '—' },
     {
       title: 'Status',
       dataIndex: 'status',
@@ -273,22 +283,23 @@ function NominationsTable({ nominations }) {
       onFilter: (value, nomination) => nomination.status === value,
       render: (status) => <StatusTag status={status} />,
     },
-    { title: 'Submitted', dataIndex: 'submitted_at', width: 180, render: (date) => formatDate(date) },
+    { title: 'Submitted', dataIndex: 'submitted_at', width: 180, responsive: ['md'], render: (date) => formatDate(date) },
     {
       title: 'Validation',
       key: 'validation',
+      responsive: ['xl'],
       render: (_, nomination) => {
         if (!nomination.validated_at) return <Text type="secondary">—</Text>
         const reason = nomination.disqualification_reason && disqualificationReasonLabels[nomination.disqualification_reason]
         return (
           <Flex vertical>
-            <Text style={{ fontSize: 13 }}>
+            <Text style={{ fontSize: 14 }}>
               {formatDate(nomination.validated_at)}
               {nomination.validated_by_name ? ` by ${nomination.validated_by_name}` : ''}
             </Text>
             {reason && (
               <Tooltip title={nomination.remarks}>
-                <Text type="danger" style={{ fontSize: 12 }}>
+                <Text type="danger" style={{ fontSize: 13 }}>
                   {reason}
                 </Text>
               </Tooltip>
@@ -314,7 +325,7 @@ function NominationsTable({ nominations }) {
         columns={columns}
         dataSource={shown}
         pagination={{ pageSize: 20, hideOnSinglePage: true }}
-        scroll={{ x: 1000 }}
+        scroll={screens.md ? { x: 1000 } : undefined}
         locale={{ emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No submitted nominations in this cycle." /> }}
       />
     </Flex>

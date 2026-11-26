@@ -52,7 +52,7 @@ const siderMenuTheme = {
       darkItemHoverBg: 'rgba(255, 255, 255, 0.06)',
       darkItemSelectedBg: 'rgba(22, 119, 255, 0.18)',
       darkItemSelectedColor: '#ffffff',
-      darkGroupTitleColor: 'rgba(255, 255, 255, 0.35)',
+      darkGroupTitleColor: 'rgba(255, 255, 255, 0.55)',
       itemHeight: 40,
       itemMarginInline: 12,
       itemMarginBlock: 2,
@@ -242,7 +242,7 @@ export default function MainLayout() {
 
       <Layout>
         <Header className="praise-header" style={{ background: colorBgContainer }}>
-          <Flex align="center" gap={12} style={{ minWidth: 0 }}>
+          <Flex align="center" gap={12} className="praise-header-left">
             <Button
               type="text"
               className="praise-header-icon-button"
@@ -255,24 +255,24 @@ export default function MainLayout() {
                 <Divider orientation="vertical" style={{ height: 20, margin: 0 }} />
                 <Breadcrumb
                   className="praise-header-breadcrumb"
-                  items={[{ title: activeCategory.label }, { title: activeItem.label }]}
+                  items={screens.xl ? [{ title: activeCategory.label }, { title: activeItem.label }] : [{ title: activeItem.label }]}
                 />
               </>
             )}
           </Flex>
 
-          <Flex align="center" gap={12} style={{ minWidth: 0 }}>
-            {screens.lg && <CyclePill />}
+          <Flex align="center" gap={screens.md ? 12 : 8} className="praise-header-right">
+            {screens.xl && <CyclePill />}
             {canManageAccess && (
               <Select
                 aria-label="Preview as"
                 className="praise-header-preview"
-                style={{ width: screens.sm ? 210 : 150 }}
+                style={{ width: screens.xl ? 210 : screens.sm ? 160 : 130 }}
                 value={preview}
                 onChange={setPreview}
                 options={previewOptions(access)}
                 prefix={<EyeOutlined />}
-                labelRender={({ label }) => (screens.sm ? <>Viewing as: {label}</> : label)}
+                labelRender={({ label }) => (screens.xl ? <>Viewing as: {label}</> : label)}
               />
             )}
             <NotificationBell />
@@ -283,7 +283,7 @@ export default function MainLayout() {
               menu={{
                 items: [
                   // The name and role are hidden in the header on phones, so show them here.
-                  ...(screens.md
+                  ...(screens.lg
                     ? []
                     : [{ key: 'name', disabled: true, label: `${me.name} (${me.role_name})` }, { type: 'divider' }]),
                   {
@@ -297,7 +297,7 @@ export default function MainLayout() {
             >
               <button type="button" className="praise-header-account" aria-label="Account menu">
                 <Avatar size={32} icon={<UserOutlined />} className="praise-header-avatar" />
-                {screens.md && (
+                {screens.lg && (
                   <span className="praise-header-account-text">
                     <span className="praise-header-account-name">{me.name}</span>
                     <span className="praise-header-account-role">{me.role_name}</span>

@@ -54,7 +54,7 @@
   border-radius: 6px;
   background: #f3f4f6;
   color: #374151;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -65,20 +65,20 @@
 
 .rating-option-label {
   color: #111827;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .rating-option-percent {
   margin-left: auto;
   color: #1677ff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 
 .rating-option-text {
   color: #6b7280;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .rating-total {

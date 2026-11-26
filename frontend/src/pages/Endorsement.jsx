@@ -9,6 +9,7 @@ import PageHeader from '../components/PageHeader'
 import { useAccess } from '../hooks/useAccess'
 import { useApi } from '../hooks/useApi'
 import { endorseAward, getEndorsement, recordConferment, withdrawEndorsement } from '../services/api'
+import { useTableScroll } from '../hooks/useTableScroll'
 
 function ConfermentModal({ target, onCancel, onSaved }) {
   const [form] = Form.useForm()
@@ -77,6 +78,7 @@ function ConfermentCell({ date, canManage, onEdit }) {
 const choiceLabels = { section: 'COH Choice - Section', employee: 'COH Choice - Employee' }
 
 export default function Endorsement() {
+  const tableScroll = useTableScroll()
   const { can } = useAccess()
   const canManage = can('endorsement.manage')
   const [modal, modalHolder] = Modal.useModal()
@@ -127,11 +129,12 @@ export default function Endorsement() {
     return [
       { title: 'Nominee', dataIndex: 'nominee_name' },
       ...(hasLevels(award.nominations) ? [{ title: 'Level', dataIndex: 'tier_label' }] : []),
-      { title: 'Screening average', dataIndex: 'average', render: formatAverage },
+      { title: 'Screening average', dataIndex: 'average', responsive: ['md'], render: formatAverage },
       { title: 'Status', dataIndex: 'status', render: (status) => <StatusTag status={status} /> },
       {
         title: 'Conferment date',
         key: 'conferment',
+        responsive: ['sm'],
         render: (_, row) =>
           row.status === 'awarded' ? (
             <ConfermentCell
@@ -216,7 +219,7 @@ export default function Endorsement() {
                   pagination={false}
                   columns={columnsFor(award)}
                   dataSource={award.nominations}
-                  scroll={{ x: 'max-content' }}
+                  scroll={tableScroll}
                 />
               </Card>
             ))
@@ -227,7 +230,7 @@ export default function Endorsement() {
               rowKey="type"
               size="middle"
               pagination={false}
-              scroll={{ x: 'max-content' }}
+              scroll={tableScroll}
               dataSource={choices}
               columns={[
                 { title: 'Award', dataIndex: 'type', render: (type) => choiceLabels[type] },
@@ -236,7 +239,7 @@ export default function Endorsement() {
                   key: 'awardee',
                   render: (_, { choice }) => choice?.awardee_name ?? <Typography.Text type="secondary">Not chosen yet</Typography.Text>,
                 },
-                { title: 'Chosen on', key: 'chosen', render: (_, { choice }) => (choice ? formatDate(choice.chosen_at) : '—') },
+                { title: 'Chosen on', key: 'chosen', responsive: ['md'], render: (_, { choice }) => (choice ? formatDate(choice.chosen_at) : '—') },
                 {
                   title: 'Conferment date',
                   key: 'conferment',

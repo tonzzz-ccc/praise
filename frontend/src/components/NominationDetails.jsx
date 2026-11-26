@@ -3,6 +3,7 @@ import { Alert, Descriptions, Drawer, Flex, Spin, Tag, Typography } from 'antd'
 import { useResponsiveDrawerSize } from '../hooks/useResponsiveDrawerSize'
 import { useApi } from '../hooks/useApi'
 import { documentUrl, getNomination } from '../services/api'
+import { formatDate } from '../utils/format'
 import {
   disqualificationReasonLabels,
   getStatus,
@@ -75,9 +76,9 @@ export function NominationSummary({ nomination, showDocuments = true }) {
           { key: 'cycle', label: 'Cycle', children: nomination.cycle_name },
           { key: 'nominator', label: 'Nominator', children: nomination.nominator_display_name ?? <NotProvided /> },
           { key: 'nominator_type', label: 'Nominated by', children: nominatorType?.label ?? <NotProvided /> },
-          { key: 'submitted', label: 'Submitted', children: nomination.submitted_at ?? 'Not yet submitted' },
+          { key: 'submitted', label: 'Submitted', children: nomination.submitted_at ? formatDate(nomination.submitted_at) : 'Not yet submitted' },
           ...(nomination.validated_at
-            ? [{ key: 'reviewed', label: 'Reviewed by', children: `${nomination.validated_by_name} on ${nomination.validated_at}` }]
+            ? [{ key: 'reviewed', label: 'Reviewed by', children: `${nomination.validated_by_name} on ${formatDate(nomination.validated_at)}` }]
             : []),
           ...(nomination.remarks ? [{ key: 'remarks', label: 'Remarks', children: nomination.remarks }] : []),
         ]}
@@ -105,7 +106,7 @@ export function NominationSummary({ nomination, showDocuments = true }) {
 
       <div>
         <Typography.Title level={5}>
-          Eligibility on {snapshot.checked_at}: {eligibilityTitle(snapshot)}
+          Eligibility on {formatDate(snapshot.checked_at)}: {eligibilityTitle(snapshot)}
         </Typography.Title>
         <Descriptions size="small" column={1} bordered items={eligibilityItems(snapshot)} />
       </div>

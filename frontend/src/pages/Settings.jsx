@@ -7,7 +7,8 @@ import SystemSettings from '../components/SystemSettings'
 import { useApi } from '../hooks/useApi'
 import { listCycles } from '../services/api'
 import { nextCycleFrom } from '../utils/cycles'
-import { formatMoney } from '../utils/format'
+import { formatMoney, formatShortDate } from '../utils/format'
+import { useTableScroll } from '../hooks/useTableScroll'
 
 const statusTags = {
   draft: { color: 'default', label: 'Draft' },
@@ -17,6 +18,7 @@ const statusTags = {
 }
 
 export default function Settings() {
+  const tableScroll = useTableScroll()
   const { data: cycles, error, loading, reload } = useApi(listCycles)
   // null, 'new' (blank), 'next' (filled in from the latest cycle), or the cycle being edited.
   const [editing, setEditing] = useState(null)
@@ -42,21 +44,25 @@ export default function Settings() {
     {
       title: 'Selection period',
       key: 'period',
+      responsive: ['lg'],
       render: (_, cycle) => `${cycle.period_start} to ${cycle.period_end}`,
     },
     {
       title: 'Nomination window',
       key: 'window',
-      render: (_, cycle) => `${cycle.nomination_start} to ${cycle.nomination_end}`,
+      responsive: ['md'],
+      render: (_, cycle) => `${formatShortDate(cycle.nomination_start)} to ${formatShortDate(cycle.nomination_end)}`,
     },
     {
       title: 'Awarding ceremony',
       dataIndex: 'ceremony_date',
-      render: (date) => date ?? 'Not set',
+      responsive: ['lg'],
+      render: (date) => (date ? formatShortDate(date) : 'Not set'),
     },
     {
       title: 'Budget',
       dataIndex: 'budget',
+      responsive: ['xl'],
       align: 'right',
       render: (budget) => (budget === null || budget === undefined ? 'Not set' : formatMoney(budget)),
     },
@@ -117,7 +123,7 @@ export default function Settings() {
                   dataSource={cycles ?? []}
                   loading={loading && !cycles}
                   pagination={false}
-                  scroll={{ x: 'max-content' }}
+                  scroll={tableScroll}
                 />
               </>
             ),

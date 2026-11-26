@@ -60,7 +60,7 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.1);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -131,7 +131,7 @@
 .dashboard-hero-caption {
   margin: 6px 0 14px;
   color: rgba(219, 234, 254, 0.6);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -159,7 +159,7 @@
   gap: 8px;
   margin-top: 8px;
   color: rgba(219, 234, 254, 0.7);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 /* ---- Insight cards ---- */
@@ -223,8 +223,8 @@
 
 .dashboard-label {
   margin-bottom: 4px;
-  color: #9ca3af;
-  font-size: 11px;
+  color: #6b7280;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -239,13 +239,13 @@
 }
 
 .dashboard-value small {
-  color: #9ca3af;
+  color: #6b7280;
   font-size: 13px;
   font-weight: 500;
 }
 
 .dashboard-value.is-muted {
-  color: #9ca3af;
+  color: #6b7280;
   font-size: 18px;
   font-weight: 700;
 }
@@ -253,7 +253,7 @@
 .dashboard-note {
   margin-top: 12px;
   color: #6b7280;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .dashboard-accent {
@@ -295,8 +295,8 @@
 
 .dashboard-awards-header p {
   margin: 2px 0 0;
-  color: #9ca3af;
-  font-size: 12px;
+  color: #6b7280;
+  font-size: 13px;
 }
 
 .dashboard-awards-body {
@@ -329,8 +329,8 @@
 }
 
 .dashboard-award-count small {
-  color: #9ca3af;
-  font-size: 11px;
+  color: #6b7280;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -350,8 +350,8 @@
 
 .dashboard-awards-empty {
   margin: 0;
-  color: #9ca3af;
-  font-size: 12px;
+  color: #6b7280;
+  font-size: 13px;
   text-align: center;
 }
 
