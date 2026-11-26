@@ -148,8 +148,8 @@ CREATE TABLE IF NOT EXISTS praise_committee_members (
   CONSTRAINT fk_praise_committee_user FOREIGN KEY (employee_id) REFERENCES users (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Committee screening: one row per committee member per nomination. scores holds 0-100 per
--- criterion; the weighted total and averages are worked out from the award's criteria_weights.
+-- Committee screening: one row per committee member per nomination. scores holds 0-4 per
+-- criterion (official rating matrix); the weighted total and averages are worked out from the award's criteria_weights.
 CREATE TABLE IF NOT EXISTS praise_screening_scores (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nomination_id INT NOT NULL,
