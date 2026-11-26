@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Alert, Button, Form, Input, Modal, Popconfirm, Select, Tag } from 'antd'
 import { CrownOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, SolutionOutlined, StopOutlined, UserOutlined } from '@ant-design/icons'
-import { CardGrid, CardGroup, CardStat, CardTop, NomineeLine } from '../components/CardList'
+import { CardGrid, CardGroup, CardStat, CardTop } from '../components/CardList'
 import PageHeader from '../components/PageHeader'
 import { useAccess } from '../hooks/useAccess'
 import { useApi } from '../hooks/useApi'
@@ -137,16 +137,14 @@ function MemberCard({ member, canManage, onRelieve, onRemove }) {
         }
       />
       <h3 className="award-card-title">{member.name}</h3>
-      <NomineeLine name={member.name} detail={`Employee No. ${member.employee_id}`} />
 
       <div className="award-card-grant">
-        {relieved ? (
+        <CardStat label="Employee No.">{member.employee_id}</CardStat>
+        {relieved && (
           <>
             <CardStat label="Relieved on">{formatShortDate(member.relieved_at)}</CardStat>
             {member.relieved_reason && <div className="nomination-card-meta" style={{ whiteSpace: 'normal' }}>{member.relieved_reason}</div>}
           </>
-        ) : (
-          <CardStat label="Seat">{roleLabel(member.role)}</CardStat>
         )}
       </div>
 
@@ -271,7 +269,7 @@ export default function Committee() {
           return (
             <CardGroup
               key={role.value}
-              title={role.seats === 1 ? role.label : `${role.label}s`}
+              title={role.value === 'member' ? 'Members' : role.label}
               tags={
                 <Tag color={seated.length >= role.seats ? 'green' : 'default'}>
                   {seated.length} of {role.seats} {role.seats === 1 ? 'seat' : 'seats'}
