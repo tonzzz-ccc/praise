@@ -1,0 +1,93 @@
+/* Extras for pages using the Nominations card layout (see CardList.jsx). */
+.card-list-nominee-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.card-list-nominee-detail {
+  overflow: hidden;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-list-stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  font-size: 13px;
+}
+
+.card-list-stat-label {
+  flex-shrink: 0;
+  color: #6b7280;
+}
+
+.card-list-stat-value {
+  min-width: 0;
+  color: #111827;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+}
+
+.card-list-stat-value .ant-tag {
+  margin: 0;
+}
+
+.card-list-group + .card-list-group {
+  margin-top: 28px;
+}
+
+.card-list-group-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-bottom: 14px;
+}
+
+.card-list-group-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.card-list-group-title h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.card-list-group-title .ant-tag {
+  margin: 0;
+}
+
+.card-list-group-extra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* An empty committee seat. */
+.award-card.is-vacant {
+  border: 1px dashed #d1d5db;
+  background: #fafcff;
+  box-shadow: none;
+}
+
+.award-card.is-vacant .award-card-chip {
+  background: #e5e7eb;
+  box-shadow: none;
+  color: #6b7280;
+}

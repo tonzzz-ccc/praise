@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Alert, Button, Flex, Input, Segmented, Select, Table, Tag } from 'antd'
+import { Alert, Button, Grid, Input, Segmented, Select, Table, Tag } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import PageHeader from '../components/PageHeader'
 import ValidationDrawer from '../components/ValidationDrawer'
@@ -8,6 +8,8 @@ import { listNominations } from '../services/api'
 import { formatShortDate } from '../utils/format'
 import { getStatus } from '../utils/nominations'
 import { useTableScroll } from '../hooks/useTableScroll'
+import './AwardCategories.css'
+import './Nominations.css'
 
 const views = [
   { value: 'submitted', label: 'To review' },
@@ -19,6 +21,7 @@ const keepOnOneLine = () => ({ style: { whiteSpace: 'nowrap' } })
 
 export default function Validation() {
   const tableScroll = useTableScroll()
+  const screens = Grid.useBreakpoint()
   const [view, setView] = useState('submitted')
   const [selectedId, setSelectedId] = useState(null)
   const [search, setSearch] = useState('')
@@ -83,13 +86,7 @@ export default function Validation() {
 
       {error && <Alert type="error" title={error.message} style={{ marginBottom: 16 }} />}
 
-      <Flex gap={8} wrap="wrap" align="center" style={{ marginBottom: 16 }}>
-        <Segmented
-          aria-label="Filter by review status"
-          options={views.map(({ value, label }) => ({ value, label: `${label} (${countFor(value)})` }))}
-          value={view}
-          onChange={setView}
-        />
+      <div className="award-toolbar">
         <Input
           allowClear
           prefix={<SearchOutlined />}
@@ -97,8 +94,34 @@ export default function Validation() {
           aria-label="Search nominations"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          style={{ width: 300, maxWidth: '100%' }}
+          className="award-toolbar-search"
         />
+        {/* Phones get a dropdown, since the tabs do not fit across. */}
+        {screens.sm === false ? (
+          <Select
+            aria-label="Filter by review status"
+            value={view}
+            onChange={setView}
+            options={views.map(({ value, label }) => ({ value, label: `${label} (${countFor(value)})` }))}
+            className="nominations-filter"
+          />
+        ) : (
+          <div className="nominations-tabs">
+            <Segmented
+              aria-label="Filter by review status"
+              value={view}
+              onChange={setView}
+              options={views.map(({ value, label }) => ({
+                value,
+                label: (
+                  <span className="nominations-tab">
+                    {label} <span className="nominations-tab-count">{countFor(value)}</span>
+                  </span>
+                ),
+              }))}
+            />
+          </div>
+        )}
         <Select
           allowClear
           aria-label="Filter by award"
@@ -106,9 +129,12 @@ export default function Validation() {
           value={award}
           onChange={setAward}
           options={awardOptions}
-          style={{ width: 220, maxWidth: '100%' }}
+          className="nominations-filter"
         />
-      </Flex>
+        <span className="award-toolbar-count">
+          {rows.length} of {(nominations ?? []).filter((nomination) => nomination.status === view).length} nominations
+        </span>
+      </div>
 
       <Table
         rowKey="id"

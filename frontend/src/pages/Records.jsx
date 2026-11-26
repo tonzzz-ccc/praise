@@ -11,6 +11,8 @@ import { getRecords, recordRelease } from '../services/api'
 import { formatDate } from '../utils/awarding'
 import { formatMoney } from '../utils/format'
 import { disqualificationReasonLabels, nominationStatuses } from '../utils/nominations'
+import './AwardCategories.css'
+import './Nominations.css'
 
 const { Text } = Typography
 
@@ -368,15 +370,26 @@ export default function Records() {
         }
       />
       {error && <Alert type="error" title={error.message} style={{ marginBottom: 16 }} />}
-      <Segmented
-        style={{ marginBottom: 16 }}
-        value={view}
-        onChange={setView}
-        options={[
-          { value: 'awardees', label: `Awardees (${counts.awardees})` },
-          { value: 'nominations', label: `All nominations (${counts.nominations})` },
-        ]}
-      />
+      <div className="award-toolbar">
+        <div className="nominations-tabs">
+          <Segmented
+            aria-label="Records view"
+            value={view}
+            onChange={setView}
+            options={[
+              { value: 'awardees', label: 'Awardees', count: counts.awardees },
+              { value: 'nominations', label: 'All nominations', count: counts.nominations },
+            ].map(({ value, label, count }) => ({
+              value,
+              label: (
+                <span className="nominations-tab">
+                  {label} <span className="nominations-tab-count">{count}</span>
+                </span>
+              ),
+            }))}
+          />
+        </div>
+      </div>
       {loading && !data ? (
         <Table loading columns={[]} dataSource={[]} />
       ) : !data ? (

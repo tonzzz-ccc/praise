@@ -10,6 +10,7 @@ import { useAccess } from '../hooks/useAccess'
 import { useApi } from '../hooks/useApi'
 import { endorseAward, getEndorsement, recordConferment, withdrawEndorsement } from '../services/api'
 import { useTableScroll } from '../hooks/useTableScroll'
+import './AwardCategories.css'
 
 function ConfermentModal({ target, onCancel, onSaved }) {
   const [form] = Form.useForm()
@@ -168,9 +169,15 @@ export default function Endorsement() {
         subtitle="Endorse each award's shortlist to the Chief of Hospital, who picks one winner per award. Then record when each award was conferred."
       />
 
-      <Flex className="page-filters" gap={8} wrap="wrap" style={{ marginBottom: 16 }}>
+      <div className="award-toolbar">
         <CycleSelect cycles={cycles} cycleId={cycleId} onChange={setCycleId} />
-      </Flex>
+        {data && (
+          <span className="award-toolbar-count">
+            {data.awards.filter((award) => award.stage === 'ready').length} ready to endorse ·{' '}
+            {data.awards.filter((award) => award.stage === 'with_coh').length} with the COH
+          </span>
+        )}
+      </div>
 
       {error && <Alert type="error" title={error.message} style={{ marginBottom: 16 }} />}
       {actionError && <Alert type="error" title={actionError} closable onClose={() => setActionError(null)} style={{ marginBottom: 16 }} />}

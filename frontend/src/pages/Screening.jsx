@@ -29,6 +29,7 @@ import {
   ratingLevels,
   ratingPercent,
 } from '../utils/nominations'
+import './AwardCategories.css'
 import './Screening.css'
 import { useTableScroll } from '../hooks/useTableScroll'
 
@@ -281,7 +282,7 @@ export default function Screening() {
         subtitle="Committee members rate each validated nominee with the rating matrix. The highest average in each award is shortlisted."
       />
 
-      <Flex className="page-filters" gap={8} wrap="wrap" style={{ marginBottom: 16 }}>
+      <div className="award-toolbar">
         <Select
           aria-label="Award cycle"
           placeholder="Select a cycle"
@@ -290,7 +291,12 @@ export default function Screening() {
           onChange={setChosenCycleId}
           options={(cycles ?? []).map((cycle) => ({ value: cycle.id, label: cycle.name }))}
         />
-      </Flex>
+        {data && (
+          <span className="award-toolbar-count">
+            {data.nominations.length} nominees in {groups.length} {groups.length === 1 ? 'award' : 'awards'}
+          </span>
+        )}
+      </div>
 
       {error && <Alert type="error" title={error.message} style={{ marginBottom: 16 }} />}
       {data && !isMember && (
